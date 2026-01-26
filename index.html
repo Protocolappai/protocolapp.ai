@@ -401,6 +401,51 @@
             object-fit: cover;
             transition: transform 0.4s ease, filter 0.4s ease;
             filter: brightness(0.5);
+            cursor: pointer;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            font-family: var(--font-sans);
+        }
+
+        .lightbox-close:hover {
+            color: var(--signal-green);
         }
 
         .feature-content {
@@ -869,7 +914,7 @@
                 <div class="features-grid">
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="feature-meal.png" alt="AI Meal Scanning" style="object-position: center 40%;">
+                            <img src="feature-meal.png" alt="AI Meal Scanning" style="object-position: center 40%;" onclick="openLightbox(this.src)">
                         </div>
                         <div class="feature-content">
                             <h3>AI Meal Scanning</h3>
@@ -878,7 +923,7 @@
                     </div>
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="feature-workout.png" alt="Workout Tracking" style="object-position: center 20%;">
+                            <img src="feature-workout.png" alt="Workout Tracking" style="object-position: center 20%;" onclick="openLightbox(this.src)">
                         </div>
                         <div class="feature-content">
                             <h3>Workout Tracking</h3>
@@ -887,7 +932,7 @@
                     </div>
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="feature-coach.png" alt="AI Coach" style="object-position: center 45%;">
+                            <img src="feature-coach.png" alt="AI Coach" style="object-position: center 45%;" onclick="openLightbox(this.src)">
                         </div>
                         <div class="feature-content">
                             <h3>AI Coach</h3>
@@ -896,7 +941,7 @@
                     </div>
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="feature-progress.png" alt="Progress Analytics" style="object-position: center 25%;">
+                            <img src="feature-progress.png" alt="Progress Analytics" style="object-position: center 25%;" onclick="openLightbox(this.src)">
                         </div>
                         <div class="feature-content">
                             <h3>Progress Analytics</h3>
@@ -905,7 +950,7 @@
                     </div>
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="feature-calorie.png" alt="Calorie Cycling" style="object-position: center 55%;">
+                            <img src="feature-calorie.png" alt="Calorie Cycling" style="object-position: center 55%;" onclick="openLightbox(this.src)">
                         </div>
                         <div class="feature-content">
                             <h3>Calorie Cycling</h3>
@@ -914,7 +959,7 @@
                     </div>
                     <div class="feature-card">
                         <div class="feature-image">
-                            <img src="feature-bodyscan.png" alt="Body Scans" style="object-position: center 60%;">
+                            <img src="feature-bodyscan.png" alt="Body Scans" style="object-position: center 60%;" onclick="openLightbox(this.src)">
                         </div>
                         <div class="feature-content">
                             <h3>Body Scans</h3>
@@ -1104,6 +1149,12 @@
         </div>
     </footer>
 
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="lightbox-close">&times;</button>
+        <img id="lightbox-img" src="" alt="Full screenshot">
+    </div>
+
     <script>
         // Page Navigation
         function showPage(pageId) {
@@ -1127,6 +1178,24 @@
                 item.classList.add('active');
             }
         }
+
+        // Lightbox Functions
+        function openLightbox(src) {
+            event.stopPropagation();
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
 
         // Scroll Animation for Feature Cards
         const observerOptions = {
