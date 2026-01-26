@@ -642,6 +642,16 @@
            RESPONSIVE
            ============================================ */
         @media (max-width: 968px) {
+            nav {
+                position: relative;
+                backdrop-filter: none;
+                background: var(--system-black);
+            }
+
+            .hero {
+                padding-top: 40px;
+            }
+
             .hero-content {
                 grid-template-columns: 1fr;
                 text-align: center;
@@ -677,6 +687,10 @@
 
             .nav-links {
                 display: none;
+            }
+
+            .logo img {
+                height: 80px;
             }
         }
 
