@@ -382,15 +382,14 @@
         .feature-card.visible {
             opacity: 1;
             transform: translateY(0);
-            transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s;
         }
 
-        .feature-card:nth-child(1) { transition-delay: 0s; }
-        .feature-card:nth-child(2) { transition-delay: 0.1s; }
-        .feature-card:nth-child(3) { transition-delay: 0.2s; }
-        .feature-card:nth-child(4) { transition-delay: 0.3s; }
-        .feature-card:nth-child(5) { transition-delay: 0.4s; }
-        .feature-card:nth-child(6) { transition-delay: 0.5s; }
+        .feature-card:nth-child(1).visible { transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s; transition-delay: 0s; }
+        .feature-card:nth-child(2).visible { transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s; transition-delay: 0.1s; }
+        .feature-card:nth-child(3).visible { transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s; transition-delay: 0.2s; }
+        .feature-card:nth-child(4).visible { transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s; transition-delay: 0.3s; }
+        .feature-card:nth-child(5).visible { transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s; transition-delay: 0.4s; }
+        .feature-card:nth-child(6).visible { transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s; transition-delay: 0.5s; }
 
         .feature-card:hover {
             border-color: var(--signal-green);
@@ -1213,11 +1212,39 @@
         });
 
         // Scroll Animation for Feature Cards
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.feature-card');
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if 
+            cards.forEach(function(card) {
+                observer.observe(card);
+            });
+        });
+
+        // Handle hash navigation
+        window.addEventListener('hashchange', function() {
+            const hash = window.location.hash.slice(1);
+            if (hash === 'privacy' || hash === 'terms') {
+                showPage(hash);
+            }
+        });
+
+        if (window.location.hash) {
+            const hash = window.location.hash.slice(1);
+            if (hash === 'privacy' || hash === 'terms') {
+                showPage(hash);
+            }
+        }
+    </script>
+</body>
+</html>
