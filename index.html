@@ -270,18 +270,28 @@
         const featureLabels = document.querySelectorAll('.feature-label');
         const phoneImages = document.querySelectorAll('.phone-screen img');
         const featuresSection = document.querySelector('.features');
-        const isMobile = window.innerWidth <= 900;
         let currentFeature = 0;
+
+        function isMobile() {
+            return window.innerWidth <= 900;
+        }
 
         function setFeature(index) {
             if (index === currentFeature) return;
             currentFeature = index;
             featureLabels.forEach((l, i) => l.classList.toggle('active', i === index));
             phoneImages.forEach((img, i) => img.classList.toggle('active', i === index));
-            if (!isMobile) {
-                anime({ targets: '.phone-frame', scale: [0.97, 1], duration: 300, easing: 'easeOutQuad' });
-            }
+            anime({ targets: '.phone-frame', scale: [0.97, 1], duration: 300, easing: 'easeOutQuad' });
         }
+
+        // Continuous morph animation (works on all devices)
+        let morphProgress = 0;
+        function morphLoop() {
+            morphProgress += 0.002;
+            animateDots(morphProgress);
+            requestAnimationFrame(morphLoop);
+        }
+        morphLoop();
 
         // Scroll handler
         let ticking = false;
@@ -296,11 +306,8 @@
                     document.querySelector('.progress-fill').style.width = (progress * 100) + '%';
                     document.querySelector('.progress-marker').style.left = (progress * 100) + '%';
 
-                    // Morph animation
-                    animateDots(progress);
-
-                    // Features (desktop only)
-                    if (!isMobile) {
+                    // Features scroll-driven switching (desktop only)
+                    if (!isMobile()) {
                         const rect = featuresSection.getBoundingClientRect();
                         const sectionProgress = Math.max(0, Math.min(1, -rect.top / (featuresSection.offsetHeight - window.innerHeight)));
                         if (sectionProgress >= 0 && sectionProgress <= 1) {
@@ -314,13 +321,10 @@
             }
         });
 
-        // Click labels to switch
+        // Click/tap labels to switch features
         featureLabels.forEach(label => {
             label.addEventListener('click', () => setFeature(parseInt(label.dataset.index)));
         });
-
-        // Initial
-        animateDots(0);
     </script>
 </body>
 </html>
