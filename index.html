@@ -21,6 +21,8 @@
             --amber: #D4A03E;
             --amber-light: #E8B84A;
             --amber-glow: rgba(212, 160, 62, 0.5);
+            --terminal-green: #00FF41;
+            --terminal-glow: rgba(0, 255, 65, 0.5);
             --text: #fff;
             --text-muted: rgba(255, 255, 255, 0.6);
             --text-subtle: rgba(255, 255, 255, 0.4);
@@ -61,7 +63,7 @@
             backdrop-filter: blur(20px);
             transform: translateY(-100%);
         }
-        .logo { height: 48px; width: 56px; opacity: 0; }
+        .logo { height: 48px; width: auto; opacity: 0; }
         .nav-cta {
             display: flex; align-items: center; gap: 0.5rem;
             background: var(--amber); color: var(--bg);
@@ -124,7 +126,7 @@
         .hero-badge {
             display: inline-flex; align-items: center; gap: 0.5rem;
             background: var(--accent-dim);
-            border: 1px solid rgba(212, 160, 62, 0.3);
+            border: 1px solid rgba(62, 207, 212, 0.3);
             padding: 0.5rem 1rem; border-radius: 50px;
             font-size: 0.75rem; font-weight: 600;
             color: var(--accent); margin-bottom: 1.5rem;
@@ -133,12 +135,13 @@
         }
         .hero-badge::before {
             content: ''; width: 6px; height: 6px;
-            background: var(--accent); border-radius: 50%;
+            background: var(--terminal-green); border-radius: 50%;
+            box-shadow: 0 0 8px var(--terminal-glow);
             animation: pulse-dot 2s ease-in-out infinite;
         }
         @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
+            0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--terminal-glow); }
+            50% { opacity: 0.6; transform: scale(0.8); box-shadow: 0 0 4px var(--terminal-glow); }
         }
         .hero-title {
             font-size: clamp(2.5rem, 10vw, 5rem);
@@ -459,12 +462,32 @@
             transform: translateY(20px);
             opacity: 0;
             transition: all 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .feature-card-content h3::before {
+            content: '';
+            width: 8px; height: 8px;
+            background: var(--terminal-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--terminal-glow);
+            flex-shrink: 0;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.4s ease;
         }
         .feature-card.visible .feature-card-content h3 {
             transform: translateY(0);
             opacity: 1;
             color: var(--accent);
             transition-delay: 0.2s;
+        }
+        .feature-card.visible .feature-card-content h3::before {
+            opacity: 1;
+            transform: scale(1);
+            animation: pulse-dot 2s ease-in-out infinite;
+            transition-delay: 0.4s;
         }
         .feature-card-content p { 
             font-size: 0.95rem; 
@@ -643,7 +666,7 @@
         /* Responsive */
         @media (min-width: 900px) {
             nav { padding: 1.5rem 4rem; }
-            .logo { height: 32px; }
+            .logo { height: 56px; }
             .hero { padding: 8rem 4rem 4rem; }
             .hero-animation { max-width: 700px; max-height: 700px; }
             .features-desktop { display: block; }
@@ -711,7 +734,7 @@
             </div>
         </div>
         <div class="hero-content">
-            <div class="hero-badge"><span>iOS Fitness App</span></div>
+            <div class="hero-badge"><span>Protocol — Compliance Engine</span></div>
             <h1 class="hero-title">
                 <span class="line"><span class="word">Strength</span></span>
                 <span class="line"><span class="word">In <span class="accent">Structure</span></span></span>
