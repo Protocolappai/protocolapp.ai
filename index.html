@@ -54,17 +54,17 @@
 
         /* FEATURES - Exploded Phone */
         .features { min-height: 400vh; position: relative; }
-        .features-sticky { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; overflow: hidden; }
+        .features-sticky { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; justify-content: center; width: 100%; }
         
-        .exploded-phone { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 800px; height: 600px; }
+        .exploded-phone { position: relative; width: 800px; height: 600px; display: flex; align-items: center; justify-content: center; }
         
         .phone-layer { position: absolute; transition: all 0.1s ease-out; }
-        .phone-frame { width: 280px; height: 560px; left: 50%; top: 50%; transform: translate(-50%, -50%); background: linear-gradient(145deg, #1a1a1a, #0d0d0d); border-radius: 45px; border: 2px solid rgba(255,255,255,0.1); }
-        .phone-screen { width: 260px; height: 540px; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #000; border-radius: 38px; overflow: hidden; }
+        .phone-frame { width: 280px; height: 560px; background: linear-gradient(145deg, #1a1a1a, #0d0d0d); border-radius: 45px; border: 2px solid rgba(255,255,255,0.1); position: relative; }
+        .phone-screen { width: 260px; height: 540px; background: #000; border-radius: 38px; overflow: hidden; position: absolute; left: 10px; top: 10px; }
         .phone-screen img { width: 100%; height: 100%; object-fit: cover; opacity: 0; position: absolute; transition: opacity 0.5s; }
         .phone-screen img.active { opacity: 1; }
-        .phone-notch { width: 100px; height: 30px; left: 50%; top: calc(50% - 255px); transform: translateX(-50%); background: #0d0d0d; border-radius: 0 0 20px 20px; }
-        .phone-glow { width: 400px; height: 400px; left: 50%; top: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); filter: blur(60px); }
+        .phone-notch { width: 100px; height: 30px; left: 50%; top: 15px; transform: translateX(-50%); background: #0d0d0d; border-radius: 0 0 20px 20px; position: absolute; z-index: 10; }
+        .phone-glow { width: 400px; height: 400px; left: 50%; top: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); filter: blur(60px); position: absolute; z-index: -1; }
 
         /* Feature Labels with connecting lines */
         .feature-label { position: absolute; opacity: 0; transition: all 0.5s; }
@@ -189,17 +189,18 @@
     <section class="features" id="features">
         <div class="features-sticky">
             <div class="exploded-phone">
-                <div class="phone-layer phone-glow"></div>
-                <div class="phone-layer phone-frame" id="phoneFrame"></div>
-                <div class="phone-layer phone-screen" id="phoneScreen">
-                    <img src="feature-meal.png" class="active" data-index="0">
-                    <img src="feature-workout.png" data-index="1">
-                    <img src="feature-coach.png" data-index="2">
-                    <img src="feature-progress.png" data-index="3">
-                    <img src="feature-calorie.png" data-index="4">
-                    <img src="feature-bodyscan.png" data-index="5">
+                <div class="phone-glow"></div>
+                <div class="phone-frame" id="phoneFrame">
+                    <div class="phone-notch" id="phoneNotch"></div>
+                    <div class="phone-screen" id="phoneScreen">
+                        <img src="feature-meal.png" class="active" data-index="0">
+                        <img src="feature-workout.png" data-index="1">
+                        <img src="feature-coach.png" data-index="2">
+                        <img src="feature-progress.png" data-index="3">
+                        <img src="feature-calorie.png" data-index="4">
+                        <img src="feature-bodyscan.png" data-index="5">
+                    </div>
                 </div>
-                <div class="phone-layer phone-notch" id="phoneNotch"></div>
             </div>
 
             <div class="feature-label label-1" data-index="0">
