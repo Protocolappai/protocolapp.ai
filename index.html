@@ -5,181 +5,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protocol — Strength In Structure</title>
     <meta name="description" content="Protocol is a discipline-focused fitness app with AI meal scanning, workout tracking, and personalized coaching.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://protocolapp.ai/">
-    <meta property="og:title" content="Protocol — Strength In Structure">
-    <meta property="og:description" content="A discipline-focused fitness app with AI meal scanning, workout tracking, and personalized coaching.">
     <meta property="og:image" content="https://protocolapp.ai/og-image.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
-        :root {
-            --system-black: #000000;
-            --surface-primary: #0a0a0a;
-            --surface-tertiary: #1a1a1a;
-            --signal-green: #40A673;
-            --signal-green-glow: rgba(64, 166, 115, 0.5);
-            --signal-cyan: #4DB3BF;
-            --text-primary: #ffffff;
-            --text-secondary: #888888;
-            --text-tertiary: #555555;
-        }
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --green: #40A673; --green-glow: rgba(64,166,115,0.5); --cyan: #4DB3BF; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--system-black); color: var(--text-primary); line-height: 1.6; }
+        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; line-height: 1.6; overflow-x: hidden; }
         a { color: inherit; text-decoration: none; }
 
-        /* Background Effects */
-        .dot-grid { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden; }
-        .dot { position: absolute; width: 3px; height: 3px; background: var(--signal-green); border-radius: 50%; opacity: 0.08; transition: all 0.3s; }
-        .gradient-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; background: radial-gradient(ellipse at 50% 30%, transparent 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.85) 100%); }
-        .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; overflow: hidden; }
-        .particle { position: absolute; width: 2px; height: 2px; background: var(--signal-green); border-radius: 50%; opacity: 0; }
+        /* Background */
+        .dot-grid { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .dot { position: absolute; width: 3px; height: 3px; background: var(--green); border-radius: 50%; opacity: 0.08; }
+        .gradient-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; background: radial-gradient(ellipse at 50% 30%, transparent 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.9) 100%); }
+        .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+        .particle { position: absolute; width: 2px; height: 2px; background: var(--green); border-radius: 50%; opacity: 0; }
 
-        /* Navigation */
-        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 0; transition: all 0.4s; }
-        nav.scrolled { background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        nav .container { max-width: 1400px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { display: flex; align-items: center; opacity: 0; transform: translateY(-20px); }
+        /* Nav */
+        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s; }
+        nav.scrolled { background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); }
         .logo img { height: 50px; }
         .nav-links { display: flex; gap: 40px; align-items: center; }
-        .nav-links a { font-size: 14px; font-weight: 500; color: var(--text-secondary); transition: all 0.3s; opacity: 0; transform: translateY(-20px); }
-        .nav-links a:hover { color: var(--text-primary); }
-        .nav-cta { background: var(--signal-green) !important; color: var(--system-black) !important; padding: 12px 28px !important; border-radius: 50px !important; font-weight: 600 !important; }
-        .nav-cta:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--signal-green-glow); }
+        .nav-links a { font-size: 14px; color: #888; }
+        .nav-links a:hover { color: #fff; }
+        .nav-cta { background: var(--green) !important; color: #000 !important; padding: 12px 28px !important; border-radius: 50px !important; font-weight: 600 !important; }
 
-        /* Hero Section */
-        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; z-index: 10; padding: 120px 40px 80px; }
-        .hero-content { text-align: center; max-width: 1000px; }
-        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(64,166,115,0.1); border: 1px solid rgba(64,166,115,0.3); padding: 8px 20px; border-radius: 50px; font-size: 13px; font-weight: 500; color: var(--signal-green); margin-bottom: 40px; opacity: 0; transform: translateY(30px); }
-        .hero-badge::before { content: ''; width: 8px; height: 8px; background: var(--signal-green); border-radius: 50%; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
-        .hero-title { font-size: clamp(48px, 10vw, 120px); font-weight: 800; line-height: 0.95; margin-bottom: 30px; letter-spacing: -3px; }
-        .hero-title .line { display: block; opacity: 0; transform: translateY(60px); }
-        .hero-title .highlight { background: linear-gradient(135deg, var(--signal-green) 0%, var(--signal-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .hero-subtitle { font-size: clamp(16px, 2vw, 22px); color: var(--text-secondary); max-width: 600px; margin: 0 auto 50px; line-height: 1.7; opacity: 0; transform: translateY(30px); }
-        .hero-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; opacity: 0; transform: translateY(30px); }
-        .btn-primary { display: inline-flex; align-items: center; gap: 12px; background: var(--signal-green); color: var(--system-black); padding: 18px 36px; border-radius: 60px; font-size: 16px; font-weight: 600; transition: all 0.4s; }
-        .btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 40px var(--signal-green-glow); }
+        /* Hero */
+        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 120px 40px 80px; position: relative; z-index: 10; }
+        .hero-content { max-width: 900px; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(64,166,115,0.1); border: 1px solid rgba(64,166,115,0.3); padding: 8px 20px; border-radius: 50px; font-size: 13px; color: var(--green); margin-bottom: 40px; }
+        .hero-badge::before { content: ''; width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.3); } }
+        .hero h1 { font-size: clamp(48px, 10vw, 100px); font-weight: 800; line-height: 1; margin-bottom: 30px; }
+        .hero .highlight { background: linear-gradient(135deg, var(--green), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 18px; color: #888; max-width: 550px; margin: 0 auto 50px; }
+        .hero-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary { display: inline-flex; align-items: center; gap: 12px; background: var(--green); color: #000; padding: 18px 36px; border-radius: 50px; font-weight: 600; transition: all 0.3s; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 20px 40px var(--green-glow); }
         .btn-primary svg { width: 20px; height: 20px; }
-        .btn-secondary { display: inline-flex; align-items: center; background: transparent; color: var(--text-primary); padding: 18px 36px; border-radius: 60px; font-size: 16px; font-weight: 500; border: 1px solid var(--surface-tertiary); transition: all 0.3s; }
-        .btn-secondary:hover { border-color: var(--signal-green); background: rgba(64,166,115,0.1); }
-
-        /* Hero Phone Display */
-        .hero-phone { margin-top: 80px; display: flex; justify-content: center; align-items: center; gap: 30px; opacity: 0; transform: translateY(50px); }
+        .btn-secondary { padding: 18px 36px; border-radius: 50px; border: 1px solid #333; }
+        .btn-secondary:hover { border-color: var(--green); background: rgba(64,166,115,0.1); }
+        .hero-phone { margin-top: 80px; display: flex; justify-content: center; align-items: center; gap: 30px; }
         .hero-phone img { width: 280px; border-radius: 30px; box-shadow: 0 50px 100px rgba(0,0,0,0.5); }
-        .hero-phone .side { width: 220px; opacity: 0.6; transform: perspective(1000px) rotateY(15deg); }
-        .hero-phone .side.right { transform: perspective(1000px) rotateY(-15deg); }
+        .hero-phone .side { width: 220px; opacity: 0.6; }
 
-        /* STICKY FEATURES SECTION */
+        /* Features Section */
         .features-section { position: relative; z-index: 10; height: 400vh; }
         .features-sticky { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .features-wrapper { display: flex; align-items: center; justify-content: center; gap: 60px; max-width: 1400px; width: 100%; padding: 0 40px; }
-        .features-left, .features-right { display: flex; flex-direction: column; gap: 20px; width: 320px; flex-shrink: 0; }
-
-        /* Feature Cards */
-        .feature-card { background: linear-gradient(145deg, rgba(26,26,26,0.9) 0%, rgba(10,10,10,0.95) 100%); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 24px; opacity: 0.3; transform: translateX(-40px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; position: relative; overflow: hidden; }
+        .features-wrapper { display: flex; align-items: center; justify-content: center; gap: 60px; max-width: 1400px; padding: 0 40px; }
+        .features-left, .features-right { display: flex; flex-direction: column; gap: 20px; width: 320px; }
+        .feature-card { background: rgba(20,20,20,0.9); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 24px; opacity: 0.3; transform: translateX(-40px); transition: all 0.5s ease; cursor: pointer; }
         .feature-card.from-right { transform: translateX(40px); }
-        .feature-card.active { opacity: 1; transform: translateX(0); border-color: rgba(64,166,115,0.4); box-shadow: 0 0 50px rgba(64,166,115,0.15); }
-        .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(64,166,115,0.1) 0%, transparent 50%); opacity: 0; transition: opacity 0.4s; }
-        .feature-card.active::before { opacity: 1; }
-        .feature-card .icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--signal-green) 0%, var(--signal-cyan) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--system-black); }
-        .feature-card .icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .feature-card.active { opacity: 1; transform: translateX(0); border-color: rgba(64,166,115,0.4); box-shadow: 0 0 40px rgba(64,166,115,0.1); }
+        .feature-card .icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--green), var(--cyan)); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+        .feature-card .icon svg { width: 24px; height: 24px; stroke: #000; fill: none; stroke-width: 2; }
         .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-        .feature-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+        .feature-card p { font-size: 14px; color: #888; }
 
-        /* Center Phone */
-        .phone-center { position: relative; flex-shrink: 0; }
-        .phone-frame { width: 280px; height: 580px; background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%); border-radius: 45px; padding: 10px; box-shadow: 0 50px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1), 0 0 80px var(--signal-green-glow); position: relative; transform-style: preserve-3d; }
+        /* Phone */
+        .phone-center { position: relative; }
+        .phone-frame { width: 280px; height: 580px; background: linear-gradient(145deg, #1a1a1a, #0a0a0a); border-radius: 45px; padding: 10px; box-shadow: 0 50px 100px rgba(0,0,0,0.5), 0 0 80px var(--green-glow); position: relative; }
         .phone-frame::before { content: ''; position: absolute; top: 16px; left: 50%; transform: translateX(-50%); width: 80px; height: 24px; background: #000; border-radius: 15px; z-index: 10; }
         .phone-screen { width: 100%; height: 100%; background: #000; border-radius: 38px; overflow: hidden; position: relative; }
-        .phone-screen img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; transition: opacity 0.6s ease; }
+        .phone-screen img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; transition: opacity 0.5s; }
         .phone-screen img.active { opacity: 1; }
-        .phone-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 450px; height: 450px; background: radial-gradient(circle, var(--signal-green-glow) 0%, transparent 60%); opacity: 0.5; filter: blur(80px); z-index: -1; animation: glowPulse 4s ease-in-out infinite; }
-        @keyframes glowPulse { 0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.15); } }
-
-        /* Orbiting Elements */
+        .phone-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; height: 400px; background: radial-gradient(circle, var(--green-glow) 0%, transparent 60%); filter: blur(60px); z-index: -1; animation: glow 4s ease-in-out infinite; }
+        @keyframes glow { 0%,100% { opacity:0.4; transform:translate(-50%,-50%) scale(1); } 50% { opacity:0.7; transform:translate(-50%,-50%) scale(1.1); } }
         .orbit-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; pointer-events: none; }
-        .orbit-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px solid rgba(64, 166, 115, 0.15); border-radius: 50%; }
+        .orbit-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px solid rgba(64,166,115,0.15); border-radius: 50%; }
         .orbit-ring.r1 { width: 380px; height: 380px; }
         .orbit-ring.r2 { width: 480px; height: 480px; }
-        .orbit-dot { position: absolute; width: 8px; height: 8px; background: var(--signal-green); border-radius: 50%; box-shadow: 0 0 20px var(--signal-green-glow); top: 50%; left: 50%; }
+        .orbit-dot { position: absolute; width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 20px var(--green-glow); top: 50%; left: 50%; }
 
-        /* Scroll Progress Dots */
+        /* Scroll Dots */
         .scroll-dots { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 50; opacity: 0; transition: opacity 0.3s; }
         .scroll-dots.visible { opacity: 1; }
-        .scroll-dot { width: 10px; height: 10px; border: 2px solid var(--text-tertiary); border-radius: 50%; transition: all 0.3s; cursor: pointer; }
-        .scroll-dot.active { background: var(--signal-green); border-color: var(--signal-green); box-shadow: 0 0 15px var(--signal-green-glow); transform: scale(1.3); }
+        .scroll-dot { width: 10px; height: 10px; border: 2px solid #555; border-radius: 50%; cursor: pointer; transition: all 0.3s; }
+        .scroll-dot.active { background: var(--green); border-color: var(--green); box-shadow: 0 0 15px var(--green-glow); }
 
-        /* Stats Section */
-        .stats-section { position: relative; z-index: 10; padding: 100px 40px; background: linear-gradient(180deg, transparent 0%, rgba(64, 166, 115, 0.02) 50%, transparent 100%); }
+        /* Stats */
+        .stats-section { position: relative; z-index: 10; padding: 100px 40px; }
         .stats-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; text-align: center; }
-        .stat-item { opacity: 0; transform: translateY(30px); }
-        .stat-item.visible { opacity: 1; transform: translateY(0); transition: all 0.8s ease; }
-        .stat-number { font-size: 56px; font-weight: 800; color: var(--signal-green); line-height: 1; margin-bottom: 8px; }
-        .stat-label { font-size: 14px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; }
+        .stat-number { font-size: 56px; font-weight: 800; color: var(--green); }
+        .stat-label { font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Support Section */
+        /* Support */
         .support-section { position: relative; z-index: 10; padding: 150px 40px; }
-        .support-card { max-width: 600px; margin: 0 auto; background: linear-gradient(145deg, rgba(26,26,26,0.6) 0%, rgba(10,10,10,0.8) 100%); border: 1px solid rgba(255,255,255,0.05); border-radius: 30px; padding: 60px; text-align: center; opacity: 0; transform: translateY(40px); }
-        .support-card.visible { opacity: 1; transform: translateY(0); transition: all 0.8s ease; }
-        .support-icon { width: 80px; height: 80px; background: linear-gradient(135deg, var(--signal-green) 0%, var(--signal-cyan) 100%); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; }
-        .support-icon svg { width: 40px; height: 40px; stroke: var(--system-black); fill: none; stroke-width: 2; }
-        .support-card h2 { font-size: 32px; font-weight: 700; margin-bottom: 15px; }
-        .support-card > p { font-size: 16px; color: var(--text-secondary); margin-bottom: 30px; }
-        .support-email { display: inline-block; background: rgba(64,166,115,0.1); border: 1px solid rgba(64,166,115,0.3); padding: 18px 36px; border-radius: 60px; font-size: 18px; font-weight: 600; color: var(--signal-green); transition: all 0.3s; max-width: 100%; word-break: break-all; }
-        .support-email:hover { background: var(--signal-green); color: var(--system-black); transform: scale(1.05); }
+        .support-card { max-width: 600px; margin: 0 auto; background: rgba(20,20,20,0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 30px; padding: 60px; text-align: center; }
+        .support-icon { width: 80px; height: 80px; background: linear-gradient(135deg, var(--green), var(--cyan)); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; }
+        .support-icon svg { width: 40px; height: 40px; stroke: #000; fill: none; stroke-width: 2; }
+        .support-card h2 { font-size: 32px; margin-bottom: 15px; }
+        .support-card > p { color: #888; margin-bottom: 30px; }
+        .support-email { display: inline-block; background: rgba(64,166,115,0.1); border: 1px solid rgba(64,166,115,0.3); padding: 18px 36px; border-radius: 50px; color: var(--green); font-weight: 600; transition: all 0.3s; }
+        .support-email:hover { background: var(--green); color: #000; }
 
         /* FAQ */
         .faq-section { max-width: 600px; margin: 60px auto 0; }
-        .faq-title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 30px; opacity: 0; transform: translateY(20px); }
-        .faq-title.visible { opacity: 1; transform: translateY(0); transition: all 0.6s; }
-        .faq-item { background: rgba(26,26,26,0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; margin-bottom: 12px; overflow: hidden; opacity: 0; transform: translateY(20px); }
-        .faq-item.visible { opacity: 1; transform: translateY(0); transition: all 0.5s ease; }
-        .faq-question { width: 100%; background: none; border: none; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: var(--text-primary); font-size: 16px; font-weight: 600; text-align: left; font-family: inherit; transition: color 0.3s; }
-        .faq-question:hover { color: var(--signal-green); }
-        .faq-question svg { width: 20px; height: 20px; stroke: var(--text-tertiary); transition: all 0.3s; }
-        .faq-item.active .faq-question svg { transform: rotate(180deg); stroke: var(--signal-green); }
-        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .faq-item { background: rgba(20,20,20,0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; margin-bottom: 12px; overflow: hidden; }
+        .faq-question { width: 100%; background: none; border: none; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; color: #fff; font-size: 16px; font-weight: 600; text-align: left; cursor: pointer; font-family: inherit; }
+        .faq-question svg { width: 20px; height: 20px; stroke: #555; transition: transform 0.3s; }
+        .faq-item.active .faq-question svg { transform: rotate(180deg); stroke: var(--green); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s; }
         .faq-item.active .faq-answer { max-height: 150px; }
-        .faq-answer p { padding: 0 24px 20px; color: var(--text-secondary); font-size: 15px; line-height: 1.6; }
+        .faq-answer p { padding: 0 24px 20px; color: #888; font-size: 15px; }
 
         /* Footer */
         footer { position: relative; z-index: 10; padding: 60px 40px 30px; border-top: 1px solid rgba(255,255,255,0.05); }
         .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .footer-logo img { height: 40px; opacity: 0.7; }
         .footer-links { display: flex; gap: 30px; }
-        .footer-links a { font-size: 14px; color: var(--text-secondary); transition: color 0.3s; }
-        .footer-links a:hover { color: var(--signal-green); }
-        .footer-copy { width: 100%; text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 13px; color: var(--text-tertiary); }
+        .footer-links a { font-size: 14px; color: #888; }
+        .footer-links a:hover { color: var(--green); }
+        .footer-copy { width: 100%; text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 13px; color: #555; }
 
-        /* Responsive */
+        /* MOBILE */
         @media (max-width: 1100px) {
-            .features-wrapper { flex-direction: column; gap: 40px; padding: 40px 20px; }
-            .features-left, .features-right { flex-direction: row; width: 100%; justify-content: center; flex-wrap: wrap; gap: 15px; }
-            .feature-card { width: 280px; transform: translateY(30px); }
-            .feature-card.from-right { transform: translateY(30px); }
-            .orbit-container { display: none; }
-            .scroll-dots { display: none; }
-        }
-        @media (max-width: 1024px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .hero-phone .side { display: none; }
+            .features-section { height: auto; }
+            .features-sticky { position: relative; height: auto; padding: 80px 0; }
+            .features-wrapper { flex-direction: column; gap: 30px; padding: 0 20px; }
+            .features-left, .features-right { flex-direction: column; width: 100%; max-width: 400px; margin: 0 auto; }
+            .feature-card { opacity: 1; transform: none !important; }
+            .phone-center { order: -1; margin-bottom: 30px; }
+            .orbit-container, .scroll-dots { display: none; }
         }
         @media (max-width: 768px) {
-            nav .container { padding: 0 20px; }
+            nav { padding: 15px 20px; }
             .nav-links { display: none; }
             .hero { padding: 100px 20px 60px; }
-            .hero-phone img { width: 240px; }
-            .phone-frame { width: 240px; height: 500px; }
-            .feature-card { width: 100%; padding: 20px; }
+            .hero h1 { font-size: 48px; }
+            .hero p { font-size: 16px; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .btn-primary, .btn-secondary { width: 100%; max-width: 280px; justify-content: center; }
+            .hero-phone .side { display: none; }
+            .hero-phone img { width: 220px; }
+            .hero-phone { gap: 0; }
+            .phone-frame { width: 220px; height: 460px; border-radius: 35px; }
+            .phone-screen { border-radius: 28px; }
+            .feature-card { padding: 20px; }
+            .feature-card .icon { width: 40px; height: 40px; }
+            .feature-card h3 { font-size: 16px; }
+            .feature-card p { font-size: 13px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 30px; }
             .stat-number { font-size: 40px; }
-            .support-card { padding: 40px 24px; }
-            .support-email { padding: 14px 24px; font-size: 14px; }
+            .support-card { padding: 40px 20px; }
+            .support-email { padding: 14px 20px; font-size: 14px; word-break: break-all; }
             .footer-content { flex-direction: column; text-align: center; }
-            .footer-links { flex-wrap: wrap; justify-content: center; gap: 20px; }
+            .footer-links { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            .dot-grid, .particles { display: none; }
         }
     </style>
 </head>
@@ -189,13 +162,11 @@
     <div class="particles" id="particles"></div>
 
     <nav id="navbar">
-        <div class="container">
-            <a href="#" class="logo"><img src="logo.png" alt="Protocol"></a>
-            <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#support">Support</a>
-                <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="nav-cta">Download</a>
-            </div>
+        <a href="#" class="logo"><img src="logo.png" alt="Protocol"></a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#support">Support</a>
+            <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="nav-cta">Download</a>
         </div>
     </nav>
 
@@ -211,11 +182,8 @@
     <section class="hero">
         <div class="hero-content">
             <div class="hero-badge">Now Available on iOS</div>
-            <h1 class="hero-title">
-                <span class="line">Strength In</span>
-                <span class="line highlight">Structure</span>
-            </h1>
-            <p class="hero-subtitle">A discipline-focused fitness app with AI meal scanning, workout tracking, and personalized coaching. No noise. Just results.</p>
+            <h1>Strength In<br><span class="highlight">Structure</span></h1>
+            <p>A discipline-focused fitness app with AI meal scanning, workout tracking, and personalized coaching. No noise. Just results.</p>
             <div class="hero-buttons">
                 <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="btn-primary">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
@@ -225,8 +193,8 @@
             </div>
             <div class="hero-phone">
                 <img src="SC3.png" class="side" alt="">
-                <img src="SC1.png" id="heroMainPhone" alt="Protocol">
-                <img src="SC5.png" class="side right" alt="">
+                <img src="SC1.png" alt="Protocol">
+                <img src="SC5.png" class="side" alt="">
             </div>
         </div>
     </section>
@@ -257,9 +225,9 @@
                     <div class="orbit-container">
                         <div class="orbit-ring r1"></div>
                         <div class="orbit-ring r2"></div>
-                        <div class="orbit-dot" id="orbitDot1"></div>
-                        <div class="orbit-dot" id="orbitDot2"></div>
-                        <div class="orbit-dot" id="orbitDot3"></div>
+                        <div class="orbit-dot" id="od1"></div>
+                        <div class="orbit-dot" id="od2"></div>
+                        <div class="orbit-dot" id="od3"></div>
                     </div>
                     <div class="phone-frame">
                         <div class="phone-screen">
@@ -296,10 +264,10 @@
 
     <section class="stats-section">
         <div class="stats-grid">
-            <div class="stat-item"><div class="stat-number" data-value="6">0</div><div class="stat-label">Core Features</div></div>
-            <div class="stat-item"><div class="stat-number" data-value="100">0</div><div class="stat-label">% Privacy Focused</div></div>
-            <div class="stat-item"><div class="stat-number" data-value="0">0</div><div class="stat-label">Ads. Ever.</div></div>
-            <div class="stat-item"><div class="stat-number" data-value="24">0</div><div class="stat-label">/7 AI Coach</div></div>
+            <div><div class="stat-number">6</div><div class="stat-label">Core Features</div></div>
+            <div><div class="stat-number">100%</div><div class="stat-label">Privacy Focused</div></div>
+            <div><div class="stat-number">0</div><div class="stat-label">Ads. Ever.</div></div>
+            <div><div class="stat-number">24/7</div><div class="stat-label">AI Coach</div></div>
         </div>
     </section>
 
@@ -311,19 +279,9 @@
             <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;" class="support-email">support@protocolaicoach.com</a>
         </div>
         <div class="faq-section">
-            <h3 class="faq-title">Frequently Asked Questions</h3>
-            <div class="faq-item">
-                <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">How accurate is the AI meal scanning?<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
-                <div class="faq-answer"><p>Our AI provides estimates within 10-15% accuracy for most meals.</p></div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">Can I cancel anytime?<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
-                <div class="faq-answer"><p>Yes, cancel anytime through your Apple ID settings.</p></div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">Is my data private?<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
-                <div class="faq-answer"><p>Yes. Your data is stored locally. Meal images are never stored.</p></div>
-            </div>
+            <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('active')">How accurate is the AI meal scanning?<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer"><p>Our AI provides estimates within 10-15% accuracy for most meals.</p></div></div>
+            <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('active')">Can I cancel anytime?<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer"><p>Yes, cancel anytime through your Apple ID settings.</p></div></div>
+            <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('active')">Is my data private?<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer"><p>Yes. Your data is stored locally. Meal images are never stored.</p></div></div>
         </div>
     </section>
 
@@ -341,213 +299,117 @@
     </footer>
 
     <script>
-        // ========== DOT GRID ==========
-        function createDotGrid() {
-            const container = document.getElementById('dotGrid');
-            const spacing = 60;
-            const cols = Math.ceil(window.innerWidth / spacing);
-            const rows = Math.ceil(window.innerHeight / spacing);
-            container.innerHTML = '';
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < cols; j++) {
-                    const dot = document.createElement('div');
-                    dot.className = 'dot';
-                    dot.style.left = (j * spacing + spacing/2) + 'px';
-                    dot.style.top = (i * spacing + spacing/2) + 'px';
-                    dot.dataset.row = i;
-                    dot.dataset.col = j;
-                    container.appendChild(dot);
-                }
-            }
-            animateDots();
-        }
+        const isMobile = window.innerWidth <= 768;
 
-        function animateDots() {
-            const dots = document.querySelectorAll('.dot');
-            function wave() {
+        // Dot Grid
+        function createDotGrid() {
+            const c = document.getElementById('dotGrid'), sp = 60;
+            const cols = Math.ceil(window.innerWidth / sp), rows = Math.ceil(window.innerHeight / sp);
+            c.innerHTML = '';
+            for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
+                const d = document.createElement('div');
+                d.className = 'dot';
+                d.style.left = (j * sp + sp/2) + 'px';
+                d.style.top = (i * sp + sp/2) + 'px';
+                d.dataset.row = i; d.dataset.col = j;
+                c.appendChild(d);
+            }
+            (function wave() {
                 const t = Date.now() * 0.0008;
-                dots.forEach(d => {
-                    const r = parseInt(d.dataset.row);
-                    const c = parseInt(d.dataset.col);
-                    const w = Math.sin(t + r * 0.4 + c * 0.4) * 0.5 + 0.5;
+                document.querySelectorAll('.dot').forEach(d => {
+                    const w = Math.sin(t + parseInt(d.dataset.row) * 0.4 + parseInt(d.dataset.col) * 0.4) * 0.5 + 0.5;
                     d.style.opacity = 0.03 + w * 0.1;
                 });
                 requestAnimationFrame(wave);
-            }
-            wave();
+            })();
         }
 
-        // ========== PARTICLES ==========
+        // Particles
         function createParticles() {
-            const container = document.getElementById('particles');
-            for (let i = 0; i < 35; i++) {
+            const c = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle';
                 p.style.left = Math.random() * 100 + '%';
                 p.style.top = Math.random() * 100 + '%';
-                container.appendChild(p);
+                c.appendChild(p);
             }
-            anime({
-                targets: '.particle',
-                translateY: () => anime.random(-180, 180),
-                translateX: () => anime.random(-80, 80),
-                opacity: [0, 0.6, 0],
-                scale: [0, 1.8, 0],
-                duration: () => anime.random(5000, 8000),
-                delay: () => anime.random(0, 4000),
-                easing: 'easeInOutQuad',
-                loop: true
+            anime({ targets: '.particle', translateY: () => anime.random(-150, 150), translateX: () => anime.random(-60, 60), opacity: [0, 0.5, 0], scale: [0, 1.5, 0], duration: () => anime.random(5000, 8000), delay: () => anime.random(0, 4000), easing: 'easeInOutQuad', loop: true });
+        }
+
+        // Orbiting Dots
+        function initOrbits() {
+            [{el:'#od1',r:190,s:0},{el:'#od2',r:240,s:120},{el:'#od3',r:190,s:240}].forEach(o => {
+                let a = o.s;
+                (function run() {
+                    a += 0.3;
+                    const dot = document.querySelector(o.el);
+                    if (dot) dot.style.transform = `translate(calc(-50% + ${Math.cos(a*Math.PI/180)*o.r}px), calc(-50% + ${Math.sin(a*Math.PI/180)*o.r}px))`;
+                    requestAnimationFrame(run);
+                })();
             });
         }
 
-        // ========== HERO ANIMATIONS ==========
-        function initHeroAnimations() {
-            anime({ targets: '.logo', opacity: [0,1], translateY: [-20,0], duration: 800, easing: 'easeOutExpo', delay: 300 });
-            anime({ targets: '.nav-links a', opacity: [0,1], translateY: [-20,0], duration: 600, delay: anime.stagger(100, {start: 500}), easing: 'easeOutExpo' });
-            anime({ targets: '.hero-badge', opacity: [0,1], translateY: [30,0], duration: 800, easing: 'easeOutExpo', delay: 600 });
-            anime({ targets: '.hero-title .line', opacity: [0,1], translateY: [60,0], duration: 1000, delay: anime.stagger(150, {start: 800}), easing: 'easeOutExpo' });
-            anime({ targets: '.hero-subtitle', opacity: [0,1], translateY: [30,0], duration: 800, easing: 'easeOutExpo', delay: 1200 });
-            anime({ targets: '.hero-buttons', opacity: [0,1], translateY: [30,0], duration: 800, easing: 'easeOutExpo', delay: 1400 });
-            anime({ targets: '.hero-phone', opacity: [0,1], translateY: [50,0], duration: 1200, easing: 'easeOutExpo', delay: 1600 });
-            
-            // Float animation
-            anime({
-                targets: '#heroMainPhone',
-                translateY: [-10, 10],
-                duration: 3000,
-                easing: 'easeInOutSine',
-                direction: 'alternate',
-                loop: true
-            });
+        // Feature switching
+        const cards = document.querySelectorAll('.feature-card');
+        const imgs = document.querySelectorAll('.phone-screen img');
+        const dots = document.querySelectorAll('.scroll-dot');
+        const dotsC = document.getElementById('scrollDots');
+        const featSec = document.querySelector('.features-section');
+        let cur = 0;
+
+        function setFeature(i) {
+            if (i === cur) return;
+            cur = i;
+            cards.forEach((c, idx) => c.classList.toggle('active', idx === i));
+            imgs.forEach((img, idx) => img.classList.toggle('active', idx === i));
+            dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+            if (!isMobile) {
+                anime({ targets: '.phone-frame', scale: [0.96, 1], rotateY: [anime.random(-5, 5), 0], duration: 400, easing: 'easeOutQuad' });
+                anime({ targets: '.phone-glow', scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.5], duration: 500 });
+            }
         }
 
-        // ========== ORBITING DOTS ==========
-        function initOrbitingDots() {
-            const orbits = [
-                { el: '#orbitDot1', radius: 190, duration: 10000, start: 0 },
-                { el: '#orbitDot2', radius: 240, duration: 14000, start: 120 },
-                { el: '#orbitDot3', radius: 190, duration: 12000, start: 240 }
-            ];
-            orbits.forEach(orbit => {
-                let angle = orbit.start;
-                function animate() {
-                    angle += 0.3;
-                    const x = Math.cos(angle * Math.PI / 180) * orbit.radius;
-                    const y = Math.sin(angle * Math.PI / 180) * orbit.radius;
-                    const dot = document.querySelector(orbit.el);
-                    if (dot) dot.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
-                    requestAnimationFrame(animate);
-                }
-                animate();
-            });
-        }
-
-        // ========== SCROLL-DRIVEN FEATURES ==========
-        const featureCards = document.querySelectorAll('.feature-card');
-        const phoneImages = document.querySelectorAll('.phone-screen img');
-        const scrollDots = document.querySelectorAll('.scroll-dot');
-        const scrollDotsContainer = document.getElementById('scrollDots');
-        const featuresSection = document.querySelector('.features-section');
-        let currentFeature = 0;
-
-        function setFeature(index) {
-            if (index === currentFeature) return;
-            currentFeature = index;
-            
-            featureCards.forEach((card, i) => card.classList.toggle('active', i === index));
-            phoneImages.forEach((img, i) => img.classList.toggle('active', i === index));
-            scrollDots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-            
-            // Phone animation
-            anime({ targets: '.phone-frame', scale: [0.96, 1], rotateY: [anime.random(-8, 8), 0], duration: 500, easing: 'easeOutElastic(1, 0.6)' });
-            anime({ targets: '.phone-glow', scale: [1, 1.25, 1], opacity: [0.4, 0.8, 0.5], duration: 700, easing: 'easeOutQuad' });
-        }
-
-        function handleScroll() {
-            // Nav background
+        window.addEventListener('scroll', () => {
             document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
-            
-            // Features section scroll progress
-            const rect = featuresSection.getBoundingClientRect();
-            const sectionHeight = featuresSection.offsetHeight - window.innerHeight;
-            const progress = -rect.top / sectionHeight;
-            
-            if (progress >= 0 && progress <= 1) {
-                scrollDotsContainer.classList.add('visible');
-                const index = Math.min(5, Math.floor(progress * 6));
-                setFeature(index);
-            } else {
-                scrollDotsContainer.classList.remove('visible');
+            if (!isMobile) {
+                const rect = featSec.getBoundingClientRect();
+                const prog = -rect.top / (featSec.offsetHeight - window.innerHeight);
+                if (prog >= 0 && prog <= 1) {
+                    dotsC.classList.add('visible');
+                    setFeature(Math.min(5, Math.floor(prog * 6)));
+                } else dotsC.classList.remove('visible');
             }
-        }
+        });
 
-        // ========== STATS ANIMATION ==========
-        function initScrollObservers() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        const num = entry.target.querySelector('.stat-number');
-                        if (num && num.dataset.value) {
-                            const val = parseInt(num.dataset.value);
-                            anime({ targets: num, innerHTML: [0, val], round: 1, duration: 2000, easing: 'easeOutExpo' });
-                        }
+        cards.forEach(c => c.addEventListener('click', () => setFeature(parseInt(c.dataset.index))));
+        dots.forEach(d => d.addEventListener('click', () => setFeature(parseInt(d.dataset.index))));
+
+        // Mouse interaction
+        if (!isMobile) {
+            document.addEventListener('mousemove', e => {
+                document.querySelectorAll('.dot').forEach(d => {
+                    const r = d.getBoundingClientRect();
+                    const dist = Math.sqrt((e.clientX - r.left) ** 2 + (e.clientY - r.top) ** 2);
+                    if (dist < 100) {
+                        const int = 1 - dist / 100;
+                        d.style.opacity = 0.08 + int * 0.5;
+                        d.style.transform = `scale(${1 + int * 2})`;
+                        d.style.boxShadow = `0 0 ${20 * int}px rgba(64,166,115,${int * 0.5})`;
                     }
                 });
-            }, { threshold: 0.3 });
-            
-            document.querySelectorAll('.stat-item, .support-card, .faq-item, .faq-title').forEach(el => observer.observe(el));
+            });
         }
 
-        // ========== MOUSE INTERACTION ==========
-        document.addEventListener('mousemove', (e) => {
-            document.querySelectorAll('.dot').forEach(d => {
-                const rect = d.getBoundingClientRect();
-                const dist = Math.sqrt(Math.pow(e.clientX - rect.left, 2) + Math.pow(e.clientY - rect.top, 2));
-                if (dist < 100) {
-                    const intensity = 1 - (dist / 100);
-                    d.style.opacity = 0.08 + intensity * 0.5;
-                    d.style.transform = `scale(${1 + intensity * 2})`;
-                    d.style.boxShadow = `0 0 ${20 * intensity}px rgba(64,166,115,${intensity * 0.5})`;
-                }
-            });
-        });
-
-        // ========== CARD & DOT CLICKS ==========
-        featureCards.forEach(card => {
-            card.addEventListener('click', () => setFeature(parseInt(card.dataset.index)));
-        });
-        scrollDots.forEach(dot => {
-            dot.addEventListener('click', () => setFeature(parseInt(dot.dataset.index)));
-        });
-
-        // ========== INIT ==========
+        // Init
         document.addEventListener('DOMContentLoaded', () => {
-            createDotGrid();
-            createParticles();
-            initHeroAnimations();
-            initOrbitingDots();
-            initScrollObservers();
-            
-            // Email fix for Cloudflare
+            if (!isMobile) { createDotGrid(); createParticles(); initOrbits(); }
+            // Email fix
             const email = 'support' + '@' + 'protocolaicoach' + '.com';
-            document.querySelectorAll('.support-email, a[onclick*="mailto"]').forEach(el => {
-                if (el.textContent.includes('protected')) el.textContent = email;
-            });
-            
-            // Fallback for animations
-            setTimeout(() => {
-                document.querySelectorAll('.logo, .nav-links a, .hero-badge, .hero-title .line, .hero-subtitle, .hero-buttons, .hero-phone').forEach(el => {
-                    if (getComputedStyle(el).opacity === '0') {
-                        el.style.opacity = '1';
-                        el.style.transform = 'none';
-                    }
-                });
-            }, 2500);
+            document.querySelectorAll('.support-email').forEach(el => { if (el.textContent.includes('protected')) el.textContent = email; });
         });
 
-        window.addEventListener('scroll', handleScroll);
-        window.addEventListener('resize', () => setTimeout(createDotGrid, 250));
+        if (!isMobile) window.addEventListener('resize', () => setTimeout(createDotGrid, 250));
     </script>
 </body>
 </html>
