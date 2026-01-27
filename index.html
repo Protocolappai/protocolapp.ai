@@ -13,15 +13,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
         :root {
-    --bg: #0a0a0a;
-    --accent: #00D4FF;           /* Cyan */
-    --accent-light: #4AE8FF;     /* Lighter cyan */
-    --accent-glow: rgba(0, 212, 255, 0.5);    /* Cyan glow */
-    --accent-dim: rgba(0, 212, 255, 0.15);    /* Dim cyan */
-    --text: #fff;
-    --text-muted: rgba(255, 255, 255, 0.6);
-    --text-subtle: rgba(255, 255, 255, 0.4);
-}
+            --bg: #0a0a0a;
+            --accent: #3ECFD4;
+            --accent-light: #5ED9DD;
+            --accent-glow: rgba(62, 207, 212, 0.5);
+            --accent-dim: rgba(62, 207, 212, 0.15);
+            --amber: #D4A03E;
+            --amber-light: #E8B84A;
+            --amber-glow: rgba(212, 160, 62, 0.5);
+            --text: #fff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --text-subtle: rgba(255, 255, 255, 0.4);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -61,14 +64,14 @@
         .logo { height: 28px; width: auto; opacity: 0; }
         .nav-cta {
             display: flex; align-items: center; gap: 0.5rem;
-            background: var(--accent); color: var(--bg);
+            background: var(--amber); color: var(--bg);
             padding: 0.625rem 1.25rem; border-radius: 50px;
             text-decoration: none; font-weight: 600; font-size: 0.875rem;
             transition: all 0.3s ease;
-            box-shadow: 0 0 20px var(--accent-glow);
+            box-shadow: 0 0 20px var(--amber-glow);
             opacity: 0;
         }
-        .nav-cta:hover { transform: scale(1.05); box-shadow: 0 0 40px var(--accent-glow); }
+        .nav-cta:hover { transform: scale(1.05); box-shadow: 0 0 40px var(--amber-glow); }
         .nav-cta svg { width: 16px; height: 16px; }
         
         /* Hero */
@@ -145,7 +148,7 @@
         }
         .hero-title .line { display: block; overflow: hidden; }
         .hero-title .word { display: inline-block; transform: translateY(100%); }
-        .hero-title .accent { color: var(--accent); }
+        .hero-title .accent { color: var(--amber); }
         .hero-subtitle {
             font-size: clamp(1rem, 3vw, 1.25rem);
             color: var(--text-muted);
@@ -154,16 +157,16 @@
         }
         .hero-cta {
             display: inline-flex; align-items: center; gap: 0.75rem;
-            background: var(--accent); color: var(--bg);
+            background: var(--amber); color: var(--bg);
             padding: 1rem 2rem; border-radius: 50px;
             text-decoration: none; font-weight: 700; font-size: 1rem;
             transition: all 0.3s ease;
-            box-shadow: 0 0 40px var(--accent-glow);
+            box-shadow: 0 0 40px var(--amber-glow);
             opacity: 0; transform: translateY(20px);
         }
         .hero-cta:hover {
             transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 60px var(--accent-glow);
+            box-shadow: 0 10px 60px var(--amber-glow);
         }
         .hero-cta svg { width: 20px; height: 20px; }
         .scroll-indicator {
@@ -412,7 +415,7 @@
             position: absolute;
             top: 1rem; right: 1rem;
             font-size: 5rem; font-weight: 800;
-            color: var(--accent);
+            color: var(--amber);
             opacity: 0;
             line-height: 1;
             transform: translateX(30px);
@@ -420,7 +423,7 @@
             z-index: 1;
         }
         .feature-card.visible .feature-card-number {
-            opacity: 0.08;
+            opacity: 0.12;
             transform: translateX(0);
         }
         
@@ -548,7 +551,7 @@
         }
         .stat-value {
             font-size: clamp(2.25rem, 8vw, 3rem);
-            font-weight: 800; color: var(--accent);
+            font-weight: 800; color: var(--amber);
             margin-bottom: 0.25rem; line-height: 1;
         }
         .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
@@ -581,16 +584,16 @@
         }
         .btn-primary {
             display: inline-flex; align-items: center; gap: 0.75rem;
-            background: var(--accent); color: var(--bg);
+            background: var(--amber); color: var(--bg);
             padding: 1rem 2rem; border-radius: 50px;
             text-decoration: none; font-weight: 700; font-size: 1rem;
             transition: all 0.3s ease;
-            box-shadow: 0 0 40px var(--accent-glow);
+            box-shadow: 0 0 40px var(--amber-glow);
             opacity: 0; transform: translateY(20px);
         }
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 60px var(--accent-glow);
+            box-shadow: 0 10px 60px var(--amber-glow);
         }
         .btn-primary svg { width: 20px; height: 20px; }
         .btn-secondary {
@@ -708,7 +711,7 @@
             </div>
         </div>
         <div class="hero-content">
-            <div class="hero-badge"><span>Protocol — Compliance Engine</span></div>
+            <div class="hero-badge"><span>iOS Fitness App</span></div>
             <h1 class="hero-title">
                 <span class="line"><span class="word">Strength</span></span>
                 <span class="line"><span class="word">In <span class="accent">Structure</span></span></span>
