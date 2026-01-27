@@ -30,7 +30,7 @@
             --text-tertiary: #555555;
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; overflow-x: hidden; }
+        html { scroll-behavior: smooth; }
         body { font-family: 'Inter', -apple-system, sans-serif; background: var(--system-black); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
         a { color: inherit; text-decoration: none; }
 
@@ -95,8 +95,18 @@
             justify-content: center; 
             width: 100%; 
             max-width: 1400px; 
+            margin: 0 auto;
             padding: 0 40px; 
-            gap: 80px; 
+            gap: 60px; 
+        }
+
+        /* Feature cards columns */
+        .feature-cards-left, .feature-cards-right { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
+            width: 300px;
+            flex-shrink: 0;
         }
         
         .features-container { display: flex; align-items: center; justify-content: center; width: 100%; max-width: 1400px; padding: 0 40px; gap: 100px; }
@@ -172,9 +182,6 @@
         .orbit-ring.ring-2 { width: 450px; height: 450px; }
         .orbit-ring.ring-3 { width: 550px; height: 550px; }
 
-        /* Feature cards that fly in */
-        .feature-cards-left, .feature-cards-right { display: flex; flex-direction: column; gap: 30px; width: 350px; }
-        
         .feature-card-mini { background: linear-gradient(145deg, rgba(26,26,26,0.9) 0%, rgba(10,10,10,0.95) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 25px; opacity: 0; transform: translateX(-100px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; position: relative; overflow: hidden; }
         
         .feature-card-mini.from-right { transform: translateX(100px); }
@@ -435,7 +442,7 @@
                     <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
                     <h2>Need Help?</h2>
                     <p>We're here to help you get the most out of Protocol. Reach out anytime.</p>
-                    <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;" class="support-email">support@protocolaicoach.com</a>
+                    <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;" class="support-email"><span class="__cf_email__" data-cfemail="42313732322d30360232302d362d212d2e232b212d23212a6c212d2f">[email&#160;protected]</span></a>
                 </div>
                 <div class="faq-section">
                     <h3 class="faq-title">Frequently Asked Questions</h3>
@@ -468,7 +475,7 @@
                     <h2>Data Storage</h2>
                     <p>Your fitness data is stored locally on your device. Meal images are processed temporarily for AI analysis and are not stored on our servers.</p>
                     <h2>Contact</h2>
-                    <p>Email: <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;">support@protocolaicoach.com</a><br>Address: 1737 Winona Blvd, Los Angeles, CA 90027</p>
+                    <p>Email: <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;"><span class="__cf_email__" data-cfemail="5e2d2b2e2e312c2a1e2e2c312a313d31323f373d313f3d36703d3133">[email&#160;protected]</span></a><br>Address: 1737 Winona Blvd, Los Angeles, CA 90027</p>
                 </div>
                 <a href="#" onclick="showPage('home'); return false;" class="back-btn">← Back to Home</a>
             </div>
@@ -487,7 +494,7 @@
                     <h2>Apple EULA</h2>
                     <p>This app is subject to <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/">Apple's Standard EULA</a>.</p>
                     <h2>Contact</h2>
-                    <p>Questions? <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;">support@protocolaicoach.com</a></p>
+                    <p>Questions? <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;"><span class="__cf_email__" data-cfemail="e0939590908f9294a090928f948f838f8c8189838f818388ce838f8d">[email&#160;protected]</span></a></p>
                 </div>
                 <a href="#" onclick="showPage('home'); return false;" class="back-btn">← Back to Home</a>
             </div>
@@ -512,7 +519,7 @@
         <div class="footer-copy">© 2026 Protocol. All rights reserved.</div>
     </footer>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ========== DOT GRID ==========
         function createDotGrid() {
             const c = document.getElementById('dotGrid');
@@ -788,16 +795,4 @@
             
             // Fallback for animations
             setTimeout(() => {
-                document.querySelectorAll('.logo, .nav-links a, .hero-badge, .hero-title .line, .hero-subtitle, .hero-buttons, .hero-phone').forEach(el => {
-                    if (getComputedStyle(el).opacity === '0') {
-                        el.style.opacity = '1';
-                        el.style.transform = 'none';
-                    }
-                });
-            }, 2500);
-        });
-
-        window.addEventListener('resize', () => { setTimeout(createDotGrid, 250); });
-    </script>
-</body>
-</html>
+                document.querySelectorAll('.logo, .nav-links a, .hero-badge, .hero-title .line, .hero-su
