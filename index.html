@@ -502,6 +502,14 @@
             initScroll();
             initPhoneRotation();
             
+            // Set email text via JS to bypass Cloudflare obfuscation
+            var emailAddr = 'support' + '@' + 'protocolaicoach' + '.com';
+            document.querySelectorAll('.support-email, a[onclick*="mailto"]').forEach(function(el) {
+                if (el.textContent.includes('protected') || el.textContent.includes('email')) {
+                    el.textContent = emailAddr;
+                }
+            });
+            
             // Fallback: show content after 2s if animations fail
             setTimeout(() => {
                 document.querySelectorAll('.logo, .nav-links a, .hero-badge, .hero-title .line, .hero-subtitle, .hero-buttons, .phone-showcase, .screenshot-side').forEach(el => {
