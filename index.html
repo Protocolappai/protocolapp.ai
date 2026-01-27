@@ -77,24 +77,83 @@
         .hero-phone .side.right { transform: perspective(1000px) rotateY(-15deg); }
 
         /* Features Showcase - The Epic Section */
-        .features-showcase { position: relative; z-index: 10; }
+        .features-showcase { position: relative; z-index: 10; height: 400vh; }
         
-        .features-sticky { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .features-sticky { 
+            position: sticky; 
+            top: 0; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: visible;
+        }
         
-        .features-scroll-area { height: 300vh; }
+        .features-container { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 100%; 
+            max-width: 1400px; 
+            padding: 0 40px; 
+            gap: 80px; 
+        }
         
         .features-container { display: flex; align-items: center; justify-content: center; width: 100%; max-width: 1400px; padding: 0 40px; gap: 100px; }
 
         /* Phone in center */
-        .feature-phone-container { position: relative; flex-shrink: 0; }
+        .feature-phone-container { 
+            position: relative; 
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         
-        .feature-phone { width: 300px; height: 620px; background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%); border-radius: 50px; padding: 10px; box-shadow: 0 50px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1), 0 0 100px var(--signal-green-glow); position: relative; transform-style: preserve-3d; }
+        .feature-phone { 
+            width: 280px; 
+            height: 580px; 
+            background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%); 
+            border-radius: 45px; 
+            padding: 10px; 
+            box-shadow: 0 50px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1), 0 0 80px var(--signal-green-glow); 
+            position: relative; 
+            transform-style: preserve-3d; 
+        }
         
-        .feature-phone::before { content: ''; position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 90px; height: 26px; background: #000; border-radius: 20px; z-index: 10; }
+        .feature-phone::before { 
+            content: ''; 
+            position: absolute; 
+            top: 16px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 80px; 
+            height: 24px; 
+            background: #000; 
+            border-radius: 20px; 
+            z-index: 10; 
+        }
         
-        .feature-phone-screen { width: 100%; height: 100%; background: #000; border-radius: 42px; overflow: hidden; position: relative; }
+        .feature-phone-screen { 
+            width: 100%; 
+            height: 100%; 
+            background: #000; 
+            border-radius: 38px; 
+            overflow: hidden; 
+            position: relative; 
+        }
         
-        .feature-phone-screen img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease; }
+        .feature-phone-screen img { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            object-position: top;
+            opacity: 0; 
+            transition: opacity 0.6s ease; 
+        }
         
         .feature-phone-screen img.active { opacity: 1; }
         
@@ -359,7 +418,6 @@
                     </div>
                 </div>
             </div>
-            <div class="features-scroll-area"></div>
         </section>
 
         <section class="stats-section">
@@ -615,30 +673,23 @@
 
         function initScrollFeatures() {
             const featuresSection = document.querySelector('.features-showcase');
-            const sectionTop = featuresSection.offsetTop;
-            const sectionHeight = featuresSection.offsetHeight - window.innerHeight;
+            
+            // Initially show first card
+            featureCards[0].classList.add('active');
             
             window.addEventListener('scroll', () => {
-                const scrollY = window.scrollY;
-                const relativeScroll = scrollY - sectionTop;
+                const rect = featuresSection.getBoundingClientRect();
+                const sectionHeight = featuresSection.offsetHeight;
+                const scrollProgress = -rect.top / (sectionHeight - window.innerHeight);
                 
-                if (relativeScroll >= 0 && relativeScroll <= sectionHeight) {
-                    const progress = relativeScroll / sectionHeight;
-                    const featureIndex = Math.min(5, Math.floor(progress * 6));
+                if (scrollProgress >= 0 && scrollProgress <= 1) {
+                    const featureIndex = Math.min(5, Math.floor(scrollProgress * 6));
                     updateFeature(featureIndex);
-                    
-                    // Show/hide scroll progress
                     document.getElementById('scrollProgress').style.opacity = '1';
                 } else {
                     document.getElementById('scrollProgress').style.opacity = '0';
                 }
             });
-            
-            // Initial state - show first feature
-            setTimeout(() => {
-                featureCards[0].classList.add('active');
-                featureImages[0].classList.add('active');
-            }, 2000);
         }
 
         // ========== STATS ANIMATION ==========
