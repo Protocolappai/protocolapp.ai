@@ -7,10 +7,9 @@
     <meta name="description" content="A discipline-focused iOS fitness app. AI meal scanning, workout tracking, and personalized coaching built around structure and consistency.">
     <meta property="og:image" content="og-image.png">
     <meta property="og:title" content="Protocol — Strength In Structure">
-    <meta property="og:description" content="A discipline-focused iOS fitness app. AI meal scanning, workout tracking, and personalized coaching.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
         :root {
@@ -18,21 +17,13 @@
             --accent: #D4A03E;
             --accent-light: #E8B84A;
             --accent-glow: rgba(212, 160, 62, 0.5);
+            --accent-dim: rgba(212, 160, 62, 0.15);
             --text: #fff;
             --text-muted: rgba(255, 255, 255, 0.6);
-            --text-subtle: rgba(255, 255, 255, 0.5);
+            --text-subtle: rgba(255, 255, 255, 0.4);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg);
@@ -40,1096 +31,690 @@
             overflow-x: hidden;
             line-height: 1.6;
         }
-
-        /* Navigation */
+        .loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .loader.hidden { opacity: 0; visibility: hidden; }
+        .loader-ring {
+            width: 60px; height: 60px;
+            border: 2px solid var(--accent-dim);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
         nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 1.5rem 4rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(to bottom, rgba(10, 10, 10, 0.95), rgba(10, 10, 10, 0));
-            backdrop-filter: blur(10px);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 1.25rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(to bottom, rgba(10, 10, 10, 0.98), rgba(10, 10, 10, 0));
+            backdrop-filter: blur(20px);
+            transform: translateY(-100%);
         }
-
-        .logo {
-            height: 32px;
-            width: auto;
+        .logo { height: 28px; width: auto; opacity: 0; }
+        .nav-cta {
+            display: flex; align-items: center; gap: 0.5rem;
+            background: var(--accent); color: var(--bg);
+            padding: 0.625rem 1.25rem; border-radius: 50px;
+            text-decoration: none; font-weight: 600; font-size: 0.875rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--accent-glow);
+            opacity: 0;
         }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent);
-        }
-
-        /* Hero Section */
+        .nav-cta:hover { transform: scale(1.05); box-shadow: 0 0 40px var(--accent-glow); }
+        .nav-cta svg { width: 16px; height: 16px; }
+        
         .hero {
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding: 8rem 4rem 4rem;
-            position: relative;
-            overflow: hidden;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 6rem 1.5rem 4rem;
+            position: relative; overflow: hidden;
         }
-
-        .hero-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-            align-items: center;
-        }
-
-        .hero-text {
-            z-index: 10;
-        }
-
-        .hero-text h1 {
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            letter-spacing: -0.02em;
-        }
-
-        .hero-text h1 span {
-            color: var(--accent);
-            position: relative;
-        }
-
-        .hero-text p {
-            font-size: 1.125rem;
-            color: var(--text-muted);
-            max-width: 480px;
-            margin-bottom: 2.5rem;
-            line-height: 1.7;
-        }
-
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: var(--accent);
-            color: var(--bg);
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 30px var(--accent-glow);
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-light);
-            transform: translateY(-2px);
-            box-shadow: 0 0 50px var(--accent-glow);
-        }
-
-        .btn-primary svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* Hero Animation Container */
         .hero-animation {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .animation-container {
-            position: relative;
-            width: 400px;
-            height: 400px;
-        }
-
-        /* Orbiting dots container */
-        .orbit-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-        }
-
-        .orbit-dot {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 15px var(--accent-glow);
-            transform-origin: center center;
-        }
-
-        /* Concentric rings */
-        .ring {
-            position: absolute;
-            border: 1px solid rgba(212, 160, 62, 0.3);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-        }
-
-        .ring-1 { width: 120px; height: 120px; }
-        .ring-2 { width: 200px; height: 200px; }
-        .ring-3 { width: 280px; height: 280px; }
-        .ring-4 { width: 360px; height: 360px; }
-
-        .ring::before {
-            content: '';
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: var(--accent);
-            border-radius: 50%;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        /* Center triangle */
-        .center-shape {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-        }
-
-        .triangle {
-            width: 0;
-            height: 0;
-            border-left: 30px solid transparent;
-            border-right: 30px solid transparent;
-            border-bottom: 52px solid var(--accent);
-            filter: drop-shadow(0 0 20px var(--accent-glow));
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(0.95); }
-        }
-
-        /* Features Section */
-        .features {
-            position: relative;
-            min-height: 100vh;
-        }
-
-        .features-desktop {
-            display: block;
-            height: 400vh;
-        }
-
-        .features-sticky {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .features-inner {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 3rem;
-            max-width: 1400px;
-            width: 100%;
-            padding: 0 4rem;
-            align-items: center;
-        }
-
-        .feature-labels-left,
-        .feature-labels-right {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .feature-label {
-            opacity: 0.3;
-            transition: all 0.5s ease;
-            position: relative;
-            padding: 1rem 0;
-        }
-
-        .feature-label.active {
-            opacity: 1;
-        }
-
-        .feature-labels-left .feature-label {
-            text-align: right;
-            padding-right: 2rem;
-        }
-
-        .feature-labels-right .feature-label {
-            text-align: left;
-            padding-left: 2rem;
-        }
-
-        .feature-label h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }
-
-        .feature-label.active h3 {
-            color: var(--accent);
-        }
-
-        .feature-label p {
-            font-size: 0.875rem;
-            color: var(--text-subtle);
-            max-width: 280px;
-            line-height: 1.6;
-        }
-
-        .feature-labels-left .feature-label p {
-            margin-left: auto;
-        }
-
-        /* Connecting lines */
-        .feature-label::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 40px;
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--accent));
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .feature-labels-left .feature-label::after {
-            right: 0;
-            background: linear-gradient(to left, transparent, var(--accent));
-        }
-
-        .feature-labels-right .feature-label::after {
-            left: 0;
-            background: linear-gradient(to right, transparent, var(--accent));
-        }
-
-        .feature-label.active::after {
-            opacity: 1;
-        }
-
-        .feature-label::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .feature-labels-left .feature-label::before {
-            right: -4px;
-        }
-
-        .feature-labels-right .feature-label::before {
-            left: -4px;
-        }
-
-        .feature-label.active::before {
-            opacity: 1;
-        }
-
-        /* Phone mockup */
-        .phone-mockup {
-            position: relative;
-            width: 280px;
-            height: 580px;
-            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
-            border-radius: 40px;
-            padding: 12px;
-            box-shadow: 
-                0 50px 100px -20px rgba(0, 0, 0, 0.8),
-                0 0 50px rgba(212, 160, 62, 0.1),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-        }
-
-        .phone-screen {
-            width: 100%;
-            height: 100%;
-            background: var(--bg);
-            border-radius: 30px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .phone-notch {
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 28px;
-            background: #000;
-            border-radius: 20px;
-            z-index: 10;
-        }
-
-        .feature-screenshot {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .feature-screenshot.active {
-            opacity: 1;
-        }
-
-        /* Mobile Features */
-        .features-mobile {
-            display: none;
-            padding: 4rem 1.5rem;
-        }
-
-        .features-mobile-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .features-mobile-header h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .features-mobile-header h2 span {
-            color: var(--accent);
-        }
-
-        .feature-cards {
-            display: grid;
-            gap: 1.5rem;
-        }
-
-        .feature-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 1.5rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .feature-card:nth-child(even) {
-            direction: rtl;
-        }
-
-        .feature-card:nth-child(even) > * {
-            direction: ltr;
-        }
-
-        .feature-card-content h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
-        .feature-card-content p {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        .feature-card-image {
-            width: 100%;
-            aspect-ratio: 9/16;
-            background: var(--bg);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-
-        .feature-card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Stats Section */
-        .stats {
-            padding: 6rem 4rem;
-            background: linear-gradient(to bottom, transparent, rgba(212, 160, 62, 0.03), transparent);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 2rem;
-            background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-item:hover {
-            border-color: rgba(212, 160, 62, 0.3);
-            transform: translateY(-5px);
-        }
-
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        /* CTA Section */
-        .cta {
-            padding: 8rem 4rem;
-            text-align: center;
-            position: relative;
-        }
-
-        .cta::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            opacity: 0.15;
+            width: 100%; height: 100%;
+            max-width: 600px; max-height: 600px;
             pointer-events: none;
         }
-
-        .cta h2 {
-            font-size: clamp(2rem, 4vw, 3.5rem);
-            font-weight: 700;
-            margin-bottom: 1.5rem;
+        .animation-container { position: relative; width: 100%; height: 100%; }
+        .hero-svg {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%; height: 90%;
+        }
+        .dot-grid {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            display: grid; grid-template-columns: repeat(9, 1fr);
+            gap: 12px; opacity: 0.6;
+        }
+        .grid-dot {
+            width: 4px; height: 4px;
+            background: var(--accent); border-radius: 50%;
+            opacity: 0; transform: scale(0);
+        }
+        .particles {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: hidden; pointer-events: none;
+        }
+        .particle {
+            position: absolute;
+            width: 4px; height: 4px;
+            background: var(--accent); border-radius: 50%;
+            opacity: 0;
+        }
+        .hero-content {
+            position: relative; z-index: 10;
+            text-align: center; max-width: 600px;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: var(--accent-dim);
+            border: 1px solid rgba(212, 160, 62, 0.3);
+            padding: 0.5rem 1rem; border-radius: 50px;
+            font-size: 0.75rem; font-weight: 600;
+            color: var(--accent); margin-bottom: 1.5rem;
+            opacity: 0; transform: translateY(20px);
+            text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        .hero-badge::before {
+            content: ''; width: 6px; height: 6px;
+            background: var(--accent); border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800; line-height: 1.05;
+            margin-bottom: 1.5rem; letter-spacing: -0.03em;
+            opacity: 0; transform: translateY(30px);
+        }
+        .hero-title .line { display: block; overflow: hidden; }
+        .hero-title .word { display: inline-block; transform: translateY(100%); }
+        .hero-title .accent { color: var(--accent); }
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            color: var(--text-muted);
+            max-width: 500px; margin: 0 auto 2.5rem;
+            line-height: 1.7; opacity: 0; transform: translateY(20px);
+        }
+        .hero-cta {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            background: var(--accent); color: var(--bg);
+            padding: 1rem 2rem; border-radius: 50px;
+            text-decoration: none; font-weight: 700; font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 40px var(--accent-glow);
+            opacity: 0; transform: translateY(20px);
+        }
+        .hero-cta:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 60px var(--accent-glow);
+        }
+        .hero-cta svg { width: 20px; height: 20px; }
+        .scroll-indicator {
+            position: absolute; bottom: 2rem; left: 50%;
+            transform: translateX(-50%);
+            display: flex; flex-direction: column;
+            align-items: center; gap: 0.5rem; opacity: 0;
+        }
+        .scroll-indicator span {
+            font-size: 0.75rem; color: var(--text-subtle);
+            text-transform: uppercase; letter-spacing: 0.15em;
+        }
+        .scroll-line {
+            width: 1px; height: 40px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            animation: scroll-pulse 2s ease-in-out infinite;
+        }
+        @keyframes scroll-pulse {
+            0%, 100% { transform: scaleY(1); opacity: 1; }
+            50% { transform: scaleY(0.5); opacity: 0.5; }
+        }
+        
+        .features { position: relative; padding: 4rem 0; }
+        .features-header {
+            text-align: center; padding: 0 1.5rem 4rem;
+            opacity: 0; transform: translateY(30px);
+        }
+        .features-header h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800; margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+        .features-header h2 span { color: var(--accent); }
+        .features-header p { color: var(--text-muted); max-width: 500px; margin: 0 auto; }
+        
+        .features-desktop { display: none; height: 400vh; }
+        .features-sticky {
+            position: sticky; top: 0; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .features-inner {
+            display: grid; grid-template-columns: 1fr auto 1fr;
+            gap: 4rem; max-width: 1400px; width: 100%;
+            padding: 0 4rem; align-items: center;
+        }
+        .feature-labels-left, .feature-labels-right {
+            display: flex; flex-direction: column; gap: 2.5rem;
+        }
+        .feature-label {
+            opacity: 0.2;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; padding: 1.5rem 0; cursor: default;
+        }
+        .feature-label.active { opacity: 1; }
+        .feature-labels-left .feature-label { text-align: right; padding-right: 2.5rem; }
+        .feature-labels-right .feature-label { text-align: left; padding-left: 2.5rem; }
+        .feature-label h3 {
+            font-size: 1.25rem; font-weight: 700;
+            margin-bottom: 0.5rem; color: var(--text);
+            transition: color 0.4s ease;
+        }
+        .feature-label.active h3 { color: var(--accent); }
+        .feature-label p {
+            font-size: 0.9rem; color: var(--text-subtle);
+            max-width: 260px; line-height: 1.6;
+            transition: color 0.4s ease;
+        }
+        .feature-label.active p { color: var(--text-muted); }
+        .feature-labels-left .feature-label p { margin-left: auto; }
+        .feature-label::after {
+            content: ''; position: absolute; top: 50%;
+            width: 50px; height: 2px;
+            background: linear-gradient(to right, transparent, var(--accent));
+            opacity: 0; transition: all 0.4s ease; transform: scaleX(0);
+        }
+        .feature-labels-left .feature-label::after {
+            right: 0; transform-origin: right;
+            background: linear-gradient(to left, transparent, var(--accent));
+        }
+        .feature-labels-right .feature-label::after { left: 0; transform-origin: left; }
+        .feature-label.active::after { opacity: 1; transform: scaleX(1); }
+        .feature-label::before {
+            content: ''; position: absolute; top: 50%;
+            transform: translateY(-50%);
+            width: 10px; height: 10px;
+            background: var(--accent); border-radius: 50%;
+            opacity: 0; transition: all 0.4s ease;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .feature-labels-left .feature-label::before { right: -5px; }
+        .feature-labels-right .feature-label::before { left: -5px; }
+        .feature-label.active::before { opacity: 1; animation: dot-anim 2s ease-in-out infinite; }
+        @keyframes dot-anim {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.2); }
+        }
+        
+        .phone-container { position: relative; }
+        .phone-glow {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            opacity: 0.4; filter: blur(40px);
+            animation: glow-pulse 4s ease-in-out infinite;
+        }
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); }
+        }
+        .phone-mockup {
+            position: relative; width: 280px; height: 580px;
+            background: linear-gradient(145deg, #1c1c1c, #0d0d0d);
+            border-radius: 45px; padding: 12px;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.9),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+        .phone-frame {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 45px; pointer-events: none;
+        }
+        .phone-screen {
+            width: 100%; height: 100%;
+            background: var(--bg); border-radius: 35px;
+            overflow: hidden; position: relative;
+        }
+        .phone-notch {
+            position: absolute; top: 8px; left: 50%;
+            transform: translateX(-50%);
+            width: 90px; height: 26px;
+            background: #000; border-radius: 15px; z-index: 10;
+        }
+        .feature-screenshot {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; object-fit: cover;
+            opacity: 0; transition: opacity 0.6s ease;
+        }
+        .feature-screenshot.active { opacity: 1; }
+        
+        .features-mobile { display: block; padding: 0 1.5rem; }
+        .feature-cards { display: flex; flex-direction: column; gap: 1.5rem; }
+        .feature-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px; overflow: hidden;
+            opacity: 0; transform: translateY(40px);
+        }
+        .feature-card-image {
+            width: 100%; aspect-ratio: 9/12;
+            overflow: hidden; position: relative;
+        }
+        .feature-card-image::after {
+            content: ''; position: absolute;
+            bottom: 0; left: 0; right: 0; height: 100px;
+            background: linear-gradient(to top, var(--bg), transparent);
+            pointer-events: none;
+        }
+        .feature-card-image img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+        .feature-card-content { padding: 1.5rem; }
+        .feature-card-content h3 {
+            font-size: 1.25rem; font-weight: 700;
+            color: var(--accent); margin-bottom: 0.5rem;
+        }
+        .feature-card-content p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+        
+        .stats {
+            padding: 6rem 1.5rem; position: relative; overflow: hidden;
+        }
+        .stats::before {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px; height: 400px;
+            background: radial-gradient(ellipse, var(--accent-dim) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 1rem; max-width: 800px; margin: 0 auto;
             position: relative;
         }
-
+        .stat-item {
+            text-align: center; padding: 2rem 1rem;
+            background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            opacity: 0; transform: translateY(30px) scale(0.95);
+            transition: all 0.4s ease;
+        }
+        .stat-item:hover {
+            border-color: rgba(212, 160, 62, 0.3);
+            transform: translateY(-5px) scale(1);
+        }
+        .stat-value {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 800; color: var(--accent);
+            margin-bottom: 0.25rem; line-height: 1;
+        }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+        
+        .cta {
+            padding: 6rem 1.5rem 8rem; text-align: center; position: relative;
+        }
+        .cta-glow {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 60%);
+            opacity: 0.2; pointer-events: none; filter: blur(60px);
+        }
+        .cta-content { position: relative; opacity: 0; transform: translateY(30px); }
+        .cta h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800; margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
         .cta p {
-            font-size: 1.125rem;
-            color: var(--text-muted);
-            margin-bottom: 3rem;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
+            font-size: 1.1rem; color: var(--text-muted);
+            margin-bottom: 2.5rem; max-width: 450px;
+            margin-left: auto; margin-right: auto;
         }
-
         .cta-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
+            display: flex; gap: 1rem;
+            justify-content: center; flex-wrap: wrap;
         }
-
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            background: var(--accent); color: var(--bg);
+            padding: 1rem 2rem; border-radius: 50px;
+            text-decoration: none; font-weight: 700; font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 60px var(--accent-glow);
+        }
+        .btn-primary svg { width: 20px; height: 20px; }
         .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: transparent;
-            color: var(--text);
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            background: transparent; color: var(--text);
+            padding: 1rem 2rem; border-radius: 50px;
+            text-decoration: none; font-weight: 600; font-size: 1rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
         }
-
-        .btn-secondary:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        /* Footer */
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-secondary svg { width: 18px; height: 18px; }
+        
         footer {
-            padding: 3rem 4rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
-
         .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 1.5rem;
+            max-width: 1400px; margin: 0 auto;
         }
-
-        .footer-links {
-            display: flex;
-            gap: 2rem;
-        }
-
+        .footer-links { display: flex; gap: 2rem; }
         .footer-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.875rem;
-            transition: color 0.3s ease;
+            color: var(--text-muted); text-decoration: none;
+            font-size: 0.875rem; transition: color 0.3s ease;
         }
-
-        .footer-links a:hover {
-            color: var(--accent);
-        }
-
-        .footer-copyright {
-            color: var(--text-subtle);
-            font-size: 0.875rem;
-        }
-
-        /* Progress Bar */
+        .footer-links a:hover { color: var(--accent); }
+        .footer-copyright { color: var(--text-subtle); font-size: 0.8rem; }
+        
         .progress-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            z-index: 1000;
+            position: fixed; bottom: 0; left: 0;
+            width: 100%; height: 3px;
+            background: rgba(255, 255, 255, 0.05); z-index: 1000;
         }
-
         .progress-bar-fill {
             height: 100%;
             background: linear-gradient(to right, var(--accent), var(--accent-light));
-            width: 0%;
+            width: 0%; box-shadow: 0 0 15px var(--accent-glow);
             transition: width 0.1s ease;
-            box-shadow: 0 0 10px var(--accent-glow);
         }
-
-        /* Section Headers */
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
+        
+        @media (min-width: 900px) {
+            nav { padding: 1.5rem 4rem; }
+            .logo { height: 32px; }
+            .hero { padding: 8rem 4rem 4rem; }
+            .hero-animation { max-width: 700px; max-height: 700px; }
+            .features-desktop { display: block; }
+            .features-mobile { display: none; }
+            .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+            .stat-item { padding: 2.5rem 1.5rem; }
+            .footer-content { flex-direction: row; justify-content: space-between; }
         }
-
-        .section-header h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .section-header h2 span {
-            color: var(--accent);
-        }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            nav {
-                padding: 1rem 1.5rem;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .hero {
-                padding: 6rem 1.5rem 3rem;
-            }
-
-            .hero-content {
-                grid-template-columns: 1fr;
-                gap: 3rem;
-                text-align: center;
-            }
-
-            .hero-text p {
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .animation-container {
-                width: 300px;
-                height: 300px;
-                margin: 0 auto;
-            }
-
-            .ring-1 { width: 90px; height: 90px; }
-            .ring-2 { width: 150px; height: 150px; }
-            .ring-3 { width: 210px; height: 210px; }
-            .ring-4 { width: 270px; height: 270px; }
-
-            .features-desktop {
-                display: none;
-            }
-
-            .features-mobile {
-                display: block;
-            }
-
-            .stats {
-                padding: 4rem 1.5rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .cta {
-                padding: 5rem 1.5rem;
-            }
-
-            footer {
-                padding: 2rem 1.5rem;
-            }
-
-            .footer-content {
-                flex-direction: column;
-                gap: 1.5rem;
-                text-align: center;
-            }
-        }
-
         @media (max-width: 400px) {
-            .hero-text h1 {
-                font-size: 2rem;
+            .hero-title { font-size: 2.25rem; }
+            .hero-cta { padding: 0.875rem 1.5rem; font-size: 0.9rem; }
+            .btn-primary, .btn-secondary {
+                padding: 0.875rem 1.5rem; font-size: 0.9rem;
+                width: 100%; justify-content: center;
             }
-
-            .hero-text p {
-                font-size: 1rem;
-            }
-
-            .btn-primary,
-            .btn-secondary {
-                padding: 0.875rem 1.5rem;
-                font-size: 0.9rem;
-            }
-
-            .animation-container {
-                width: 250px;
-                height: 250px;
-            }
-
-            .ring-1 { width: 75px; height: 75px; }
-            .ring-2 { width: 125px; height: 125px; }
-            .ring-3 { width: 175px; height: 175px; }
-            .ring-4 { width: 225px; height: 225px; }
-
-            .stat-value {
-                font-size: 2rem;
-            }
-
-            .feature-card {
-                grid-template-columns: 1fr;
-            }
-
-            .feature-card:nth-child(even) {
-                direction: ltr;
-            }
-
-            .feature-card-image {
-                max-width: 200px;
-                margin: 0 auto;
-            }
+            .stat-item { padding: 1.5rem 1rem; }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
+    <div class="loader"><div class="loader-ring"></div></div>
+    
     <nav>
         <img src="logo.png" alt="Protocol" class="logo">
-        <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#download" class="btn-primary">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+        <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="nav-cta">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            Download
+        </a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-animation">
+            <div class="animation-container">
+                <svg class="hero-svg" viewBox="0 0 400 400">
+                    <defs>
+                        <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#D4A03E;stop-opacity:0.8" />
+                            <stop offset="50%" style="stop-color:#D4A03E;stop-opacity:0.2" />
+                            <stop offset="100%" style="stop-color:#D4A03E;stop-opacity:0.8" />
+                        </linearGradient>
+                        <filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                    </defs>
+                    <circle class="ring ring-outer" cx="200" cy="200" r="180" fill="none" stroke="url(#ringGradient)" stroke-width="1" stroke-dasharray="8 4" opacity="0"/>
+                    <circle class="ring ring-mid-1" cx="200" cy="200" r="150" fill="none" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="4 8" opacity="0"/>
+                    <circle class="ring ring-mid-2" cx="200" cy="200" r="120" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0"/>
+                    <circle class="ring ring-inner" cx="200" cy="200" r="90" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="2 10" opacity="0" filter="url(#glow)"/>
+                    <polygon class="center-triangle" points="200,160 230,220 170,220" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0" filter="url(#glow)"/>
+                    <g class="orbit-dots">
+                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
+                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
+                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
+                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
+                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
+                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
+                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
+                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
+                    </g>
+                    <path class="accent-arc arc-1" d="M 200 50 A 150 150 0 0 1 350 200" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" opacity="0" filter="url(#glow)"/>
+                    <path class="accent-arc arc-2" d="M 200 350 A 150 150 0 0 1 50 200" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" opacity="0" filter="url(#glow)"/>
                 </svg>
+                <div class="dot-grid" id="dotGrid"></div>
+                <div class="particles" id="particles"></div>
+            </div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge"><span>iOS Fitness App</span></div>
+            <h1 class="hero-title">
+                <span class="line"><span class="word">Strength</span></span>
+                <span class="line"><span class="word">In <span class="accent">Structure</span></span></span>
+            </h1>
+            <p class="hero-subtitle">A discipline-focused fitness app. AI meal scanning, workout tracking, and personalized coaching built around structure—not gamification.</p>
+            <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="hero-cta">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
                 Download for iOS
             </a>
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1>Strength In <span>Structure</span></h1>
-                <p>A discipline-focused iOS fitness app. AI meal scanning, workout tracking, and personalized coaching built around structure and consistency—not gamification.</p>
-                <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="btn-primary">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                    </svg>
-                    Download for iOS
-                </a>
-            </div>
-            <div class="hero-animation">
-                <div class="animation-container">
-                    <!-- Orbiting dots -->
-                    <div class="orbit-container" id="orbitContainer"></div>
-                    
-                    <!-- Concentric rings -->
-                    <div class="ring ring-1" id="ring1"></div>
-                    <div class="ring ring-2" id="ring2"></div>
-                    <div class="ring ring-3" id="ring3"></div>
-                    <div class="ring ring-4" id="ring4"></div>
-                    
-                    <!-- Center triangle -->
-                    <div class="center-shape">
-                        <div class="triangle"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="scroll-indicator"><span>Scroll</span><div class="scroll-line"></div></div>
     </section>
 
-    <!-- Features Section - Desktop -->
     <section class="features" id="features">
+        <div class="features-header">
+            <h2>Built for <span>Discipline</span></h2>
+            <p>Six powerful features designed to keep you consistent, accountable, and progressing.</p>
+        </div>
         <div class="features-desktop">
             <div class="features-sticky">
                 <div class="features-inner">
                     <div class="feature-labels-left">
-                        <div class="feature-label active" data-feature="0">
-                            <h3>AI Meal Scanning</h3>
-                            <p>Point. Shoot. Logged. Instant macro estimates from any meal photo.</p>
-                        </div>
-                        <div class="feature-label" data-feature="1">
-                            <h3>Workout Tracking</h3>
-                            <p>Log sets, track PRs, monitor volume with analytics that matter.</p>
-                        </div>
-                        <div class="feature-label" data-feature="2">
-                            <h3>AI Coach</h3>
-                            <p>Contextual guidance that knows your goals and constraints.</p>
+                        <div class="feature-label active" data-feature="0"><h3>AI Meal Scanning</h3><p>Point. Shoot. Logged. Instant macro estimates from any meal photo.</p></div>
+                        <div class="feature-label" data-feature="1"><h3>Workout Tracking</h3><p>Log sets, track PRs, monitor volume with analytics that matter.</p></div>
+                        <div class="feature-label" data-feature="2"><h3>AI Coach</h3><p>Contextual guidance that knows your goals and constraints.</p></div>
+                    </div>
+                    <div class="phone-container">
+                        <div class="phone-glow"></div>
+                        <div class="phone-mockup">
+                            <div class="phone-frame"></div>
+                            <div class="phone-screen">
+                                <div class="phone-notch"></div>
+                                <img src="feature-meal.png" alt="AI Meal Scanning" class="feature-screenshot active" data-feature="0">
+                                <img src="feature-workout.png" alt="Workout Tracking" class="feature-screenshot" data-feature="1">
+                                <img src="feature-coach.png" alt="AI Coach" class="feature-screenshot" data-feature="2">
+                                <img src="feature-progress.png" alt="Progress Analytics" class="feature-screenshot" data-feature="3">
+                                <img src="feature-calorie.png" alt="Calorie Cycling" class="feature-screenshot" data-feature="4">
+                                <img src="feature-bodyscan.png" alt="Body Scans" class="feature-screenshot" data-feature="5">
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="phone-mockup">
-                        <div class="phone-screen">
-                            <div class="phone-notch"></div>
-                            <img src="feature-meal.png" alt="AI Meal Scanning" class="feature-screenshot active" data-feature="0">
-                            <img src="feature-workout.png" alt="Workout Tracking" class="feature-screenshot" data-feature="1">
-                            <img src="feature-coach.png" alt="AI Coach" class="feature-screenshot" data-feature="2">
-                            <img src="feature-progress.png" alt="Progress Analytics" class="feature-screenshot" data-feature="3">
-                            <img src="feature-calorie.png" alt="Calorie Cycling" class="feature-screenshot" data-feature="4">
-                            <img src="feature-bodyscan.png" alt="Body Scans" class="feature-screenshot" data-feature="5">
-                        </div>
-                    </div>
-                    
                     <div class="feature-labels-right">
-                        <div class="feature-label" data-feature="3">
-                            <h3>Progress Analytics</h3>
-                            <p>Weekly trends and compliance tracking. Data interpreted.</p>
-                        </div>
-                        <div class="feature-label" data-feature="4">
-                            <h3>Calorie Cycling</h3>
-                            <p>Intelligent high/low day distribution for your weekly budget.</p>
-                        </div>
-                        <div class="feature-label" data-feature="5">
-                            <h3>Body Scans</h3>
-                            <p>AI composition analysis. Protein targets from lean mass.</p>
-                        </div>
+                        <div class="feature-label" data-feature="3"><h3>Progress Analytics</h3><p>Weekly trends and compliance tracking. Data interpreted.</p></div>
+                        <div class="feature-label" data-feature="4"><h3>Calorie Cycling</h3><p>Intelligent high/low day distribution for your weekly budget.</p></div>
+                        <div class="feature-label" data-feature="5"><h3>Body Scans</h3><p>AI composition analysis. Protein targets from lean mass.</p></div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Features Section - Mobile -->
         <div class="features-mobile">
-            <div class="features-mobile-header">
-                <h2>Built for <span>Discipline</span></h2>
-            </div>
             <div class="feature-cards">
-                <div class="feature-card">
-                    <div class="feature-card-content">
-                        <h3>AI Meal Scanning</h3>
-                        <p>Point. Shoot. Logged. Instant macro estimates from any meal photo.</p>
-                    </div>
-                    <div class="feature-card-image">
-                        <img src="feature-meal.png" alt="AI Meal Scanning">
-                    </div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-content">
-                        <h3>Workout Tracking</h3>
-                        <p>Log sets, track PRs, monitor volume with analytics that matter.</p>
-                    </div>
-                    <div class="feature-card-image">
-                        <img src="feature-workout.png" alt="Workout Tracking">
-                    </div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-content">
-                        <h3>AI Coach</h3>
-                        <p>Contextual guidance that knows your goals and constraints.</p>
-                    </div>
-                    <div class="feature-card-image">
-                        <img src="feature-coach.png" alt="AI Coach">
-                    </div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-content">
-                        <h3>Progress Analytics</h3>
-                        <p>Weekly trends and compliance tracking. Data interpreted.</p>
-                    </div>
-                    <div class="feature-card-image">
-                        <img src="feature-progress.png" alt="Progress Analytics">
-                    </div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-content">
-                        <h3>Calorie Cycling</h3>
-                        <p>Intelligent high/low day distribution for your weekly budget.</p>
-                    </div>
-                    <div class="feature-card-image">
-                        <img src="feature-calorie.png" alt="Calorie Cycling">
-                    </div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-content">
-                        <h3>Body Scans</h3>
-                        <p>AI composition analysis. Protein targets from lean mass.</p>
-                    </div>
-                    <div class="feature-card-image">
-                        <img src="feature-bodyscan.png" alt="Body Scans">
-                    </div>
-                </div>
+                <div class="feature-card"><div class="feature-card-image"><img src="feature-meal.png" alt="AI Meal Scanning"></div><div class="feature-card-content"><h3>AI Meal Scanning</h3><p>Point. Shoot. Logged. Instant macro estimates from any meal photo.</p></div></div>
+                <div class="feature-card"><div class="feature-card-image"><img src="feature-workout.png" alt="Workout Tracking"></div><div class="feature-card-content"><h3>Workout Tracking</h3><p>Log sets, track PRs, monitor volume with analytics that matter.</p></div></div>
+                <div class="feature-card"><div class="feature-card-image"><img src="feature-coach.png" alt="AI Coach"></div><div class="feature-card-content"><h3>AI Coach</h3><p>Contextual guidance that knows your goals and constraints.</p></div></div>
+                <div class="feature-card"><div class="feature-card-image"><img src="feature-progress.png" alt="Progress Analytics"></div><div class="feature-card-content"><h3>Progress Analytics</h3><p>Weekly trends and compliance tracking. Data interpreted.</p></div></div>
+                <div class="feature-card"><div class="feature-card-image"><img src="feature-calorie.png" alt="Calorie Cycling"></div><div class="feature-card-content"><h3>Calorie Cycling</h3><p>Intelligent high/low day distribution for your weekly budget.</p></div></div>
+                <div class="feature-card"><div class="feature-card-image"><img src="feature-bodyscan.png" alt="Body Scans"></div><div class="feature-card-content"><h3>Body Scans</h3><p>AI composition analysis. Protein targets from lean mass.</p></div></div>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
     <section class="stats">
         <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-value">6</div>
-                <div class="stat-label">Core Features</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">100%</div>
-                <div class="stat-label">Private</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">0</div>
-                <div class="stat-label">Ads</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">24/7</div>
-                <div class="stat-label">AI Coach</div>
-            </div>
+            <div class="stat-item"><div class="stat-value">6</div><div class="stat-label">Core Features</div></div>
+            <div class="stat-item"><div class="stat-value">100%</div><div class="stat-label">Private</div></div>
+            <div class="stat-item"><div class="stat-value">0</div><div class="stat-label">Ads</div></div>
+            <div class="stat-item"><div class="stat-value">24/7</div><div class="stat-label">AI Coach</div></div>
         </div>
     </section>
 
-    <!-- CTA Section -->
     <section class="cta" id="download">
-        <h2>Ready to build discipline?</h2>
-        <p>Join Protocol and transform structure into strength. No gimmicks, just results.</p>
-        <div class="cta-buttons">
-            <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="btn-primary">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                </svg>
-                Download for iOS
-            </a>
-            <a href="mailto:support@protocolaicoach.com" class="btn-secondary">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
-                </svg>
-                Contact Us
-            </a>
+        <div class="cta-glow"></div>
+        <div class="cta-content">
+            <h2>Ready to build discipline?</h2>
+            <p>Join Protocol and transform structure into strength. No gimmicks, just results.</p>
+            <div class="cta-buttons">
+                <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="btn-primary">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                    Download for iOS
+                </a>
+                <a href="mailto:support@protocolaicoach.com" class="btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    Contact Us
+                </a>
+            </div>
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <div class="footer-links">
-                <a href="privacy.html">Privacy</a>
-                <a href="terms.html">Terms</a>
-                <a href="mailto:support@protocolaicoach.com">Support</a>
-            </div>
-            <div class="footer-copyright">
-                © 2026 Protocol
-            </div>
+            <div class="footer-links"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="mailto:support@protocolaicoach.com">Support</a></div>
+            <div class="footer-copyright">© 2026 Protocol</div>
         </div>
     </footer>
 
-    <!-- Progress Bar -->
-    <div class="progress-bar">
-        <div class="progress-bar-fill" id="progressBar"></div>
-    </div>
+    <div class="progress-bar"><div class="progress-bar-fill" id="progressBar"></div></div>
 
     <script>
-        // Create orbiting dots
-        const orbitContainer = document.getElementById('orbitContainer');
-        const numDots = 12;
-        const radius = 180;
-        
-        for (let i = 0; i < numDots; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'orbit-dot';
-            dot.style.cssText = `
-                left: calc(50% - 4px);
-                top: calc(50% - 4px);
-            `;
-            orbitContainer.appendChild(dot);
-        }
-
-        // Anime.js animations
         document.addEventListener('DOMContentLoaded', function() {
-            // Orbiting dots animation
-            const dots = document.querySelectorAll('.orbit-dot');
-            dots.forEach((dot, i) => {
-                const angle = (i / numDots) * Math.PI * 2;
-                anime({
-                    targets: dot,
-                    translateX: [
-                        { value: Math.cos(angle) * radius, duration: 0 },
-                        { value: Math.cos(angle + Math.PI * 2) * radius, duration: 20000 }
-                    ],
-                    translateY: [
-                        { value: Math.sin(angle) * radius, duration: 0 },
-                        { value: Math.sin(angle + Math.PI * 2) * radius, duration: 20000 }
-                    ],
-                    easing: 'linear',
-                    loop: true
+            const dotGrid = document.getElementById('dotGrid');
+            for (let i = 0; i < 81; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'grid-dot';
+                dotGrid.appendChild(dot);
+            }
+            const particles = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particles.appendChild(particle);
+            }
+            setTimeout(() => {
+                document.querySelector('.loader').classList.add('hidden');
+                startAnimations();
+            }, 800);
+
+            function startAnimations() {
+                anime({ targets: 'nav', translateY: ['-100%', '0%'], duration: 800, easing: 'easeOutExpo', delay: 200 });
+                anime({ targets: '.logo, .nav-cta', opacity: [0, 1], translateY: [-20, 0], duration: 800, delay: anime.stagger(100, {start: 400}), easing: 'easeOutExpo' });
+                anime({ targets: '.ring', opacity: [0, 0.6], strokeDashoffset: [anime.setDashoffset, 0], duration: 2000, delay: anime.stagger(200, {start: 500}), easing: 'easeOutExpo' });
+                anime({ targets: '.ring-outer', rotate: 360, duration: 60000, loop: true, easing: 'linear' });
+                anime({ targets: '.ring-mid-1', rotate: -360, duration: 45000, loop: true, easing: 'linear' });
+                anime({ targets: '.ring-mid-2', rotate: 360, duration: 30000, loop: true, easing: 'linear' });
+                anime({ targets: '.ring-inner', rotate: -360, duration: 20000, loop: true, easing: 'linear' });
+                anime({ targets: '.center-triangle', opacity: [0, 1], scale: [0.5, 1], duration: 1500, delay: 1000, easing: 'easeOutElastic(1, .5)' });
+                anime({ targets: '.center-triangle', rotate: 360, duration: 25000, loop: true, easing: 'linear' });
+                anime({ targets: '.accent-arc', opacity: [0, 1], strokeDashoffset: [anime.setDashoffset, 0], duration: 2000, delay: anime.stagger(300, {start: 800}), easing: 'easeInOutQuart' });
+                anime({ targets: '.arc-1', rotate: [0, 360], duration: 40000, loop: true, easing: 'linear' });
+                anime({ targets: '.arc-2', rotate: [0, -360], duration: 35000, loop: true, easing: 'linear' });
+                
+                const orbitDots = document.querySelectorAll('.orbit-dot');
+                orbitDots.forEach((dot, i) => {
+                    const angle = (i / orbitDots.length) * Math.PI * 2;
+                    const radius = 180;
+                    anime({ targets: dot, opacity: [0, 1], duration: 500, delay: 1000 + i * 100, easing: 'easeOutExpo' });
+                    anime({
+                        targets: dot,
+                        translateX: function() { return [Math.cos(angle) * radius - 200, Math.cos(angle + Math.PI * 2) * radius - 200]; },
+                        translateY: function() { return [Math.sin(angle) * radius - 200, Math.sin(angle + Math.PI * 2) * radius - 200]; },
+                        duration: 15000, loop: true, easing: 'linear'
+                    });
                 });
-            });
+                
+                anime({ targets: '.grid-dot', scale: [0, 1], opacity: [0, 0.4], delay: anime.stagger(30, {grid: [9, 9], from: 'center'}), duration: 1000, easing: 'easeOutExpo' });
+                anime({ targets: '.grid-dot', scale: [1, 1.5, 1], opacity: [0.4, 0.8, 0.4], delay: anime.stagger(50, {grid: [9, 9], from: 'center', start: 2000}), duration: 2000, loop: true, easing: 'easeInOutQuad' });
+                
+                document.querySelectorAll('.particle').forEach((particle, i) => {
+                    anime({
+                        targets: particle, opacity: [0, 0.6, 0], translateY: [0, -100],
+                        translateX: () => anime.random(-50, 50), scale: [0, 1, 0],
+                        duration: () => anime.random(3000, 6000), delay: () => anime.random(0, 3000),
+                        loop: true, easing: 'easeInOutQuad'
+                    });
+                });
+                
+                anime({ targets: '.hero-badge', opacity: [0, 1], translateY: [20, 0], duration: 1000, delay: 600, easing: 'easeOutExpo' });
+                anime({ targets: '.hero-title', opacity: [0, 1], duration: 100, delay: 700 });
+                anime({ targets: '.hero-title .word', translateY: ['100%', '0%'], duration: 1200, delay: anime.stagger(150, {start: 800}), easing: 'easeOutExpo' });
+                anime({ targets: '.hero-subtitle', opacity: [0, 1], translateY: [20, 0], duration: 1000, delay: 1200, easing: 'easeOutExpo' });
+                anime({ targets: '.hero-cta', opacity: [0, 1], translateY: [20, 0], duration: 1000, delay: 1400, easing: 'easeOutExpo' });
+                anime({ targets: '.scroll-indicator', opacity: [0, 1], duration: 1000, delay: 2000, easing: 'easeOutExpo' });
+            }
 
-            // Ring rotations
-            anime({
-                targets: '#ring1',
-                rotate: '1turn',
-                duration: 8000,
-                easing: 'linear',
-                loop: true
-            });
+            const observerOptions = { threshold: 0.2, rootMargin: '0px 0px -100px 0px' };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target;
+                        if (target.classList.contains('features-header')) { anime({ targets: target, opacity: [0, 1], translateY: [30, 0], duration: 1000, easing: 'easeOutExpo' }); }
+                        if (target.classList.contains('feature-card')) { anime({ targets: target, opacity: [0, 1], translateY: [40, 0], duration: 800, easing: 'easeOutExpo' }); }
+                        if (target.classList.contains('stat-item')) { anime({ targets: target, opacity: [0, 1], translateY: [30, 0], scale: [0.95, 1], duration: 800, easing: 'easeOutExpo' }); }
+                        if (target.classList.contains('cta-content')) { anime({ targets: target, opacity: [0, 1], translateY: [30, 0], duration: 1000, easing: 'easeOutExpo' }); }
+                        observer.unobserve(target);
+                    }
+                });
+            }, observerOptions);
+            document.querySelectorAll('.features-header, .feature-card, .stat-item, .cta-content').forEach(el => { observer.observe(el); });
 
-            anime({
-                targets: '#ring2',
-                rotate: '-1turn',
-                duration: 12000,
-                easing: 'linear',
-                loop: true
-            });
+            const featuresSection = document.querySelector('.features-desktop');
+            const featureLabels = document.querySelectorAll('.feature-label');
+            const featureScreenshots = document.querySelectorAll('.feature-screenshot');
+            const totalFeatures = 6;
 
-            anime({
-                targets: '#ring3',
-                rotate: '1turn',
-                duration: 16000,
-                easing: 'linear',
-                loop: true
-            });
+            function updateFeatures() {
+                if (!featuresSection || window.innerWidth <= 900) return;
+                const rect = featuresSection.getBoundingClientRect();
+                const sectionHeight = featuresSection.offsetHeight;
+                const scrollProgress = Math.max(0, Math.min(1, -rect.top / (sectionHeight - window.innerHeight)));
+                const featureIndex = Math.min(Math.floor(scrollProgress * totalFeatures), totalFeatures - 1);
+                featureLabels.forEach((label) => { const idx = parseInt(label.dataset.feature); label.classList.toggle('active', idx === featureIndex); });
+                featureScreenshots.forEach((screenshot) => { const idx = parseInt(screenshot.dataset.feature); screenshot.classList.toggle('active', idx === featureIndex); });
+            }
 
-            anime({
-                targets: '#ring4',
-                rotate: '-1turn',
-                duration: 20000,
-                easing: 'linear',
-                loop: true
-            });
-        });
+            const progressBar = document.getElementById('progressBar');
+            function updateProgressBar() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollPercent = (scrollTop / docHeight) * 100;
+                progressBar.style.width = scrollPercent + '%';
+            }
 
-        // Scroll-driven features
-        const featuresSection = document.querySelector('.features-desktop');
-        const featureLabels = document.querySelectorAll('.feature-label');
-        const featureScreenshots = document.querySelectorAll('.feature-screenshot');
-        const totalFeatures = 6;
-
-        function updateFeatures() {
-            if (!featuresSection || window.innerWidth <= 900) return;
-
-            const rect = featuresSection.getBoundingClientRect();
-            const sectionHeight = featuresSection.offsetHeight;
-            const scrollProgress = Math.max(0, Math.min(1, -rect.top / (sectionHeight - window.innerHeight)));
-            
-            const featureIndex = Math.min(
-                Math.floor(scrollProgress * totalFeatures),
-                totalFeatures - 1
-            );
-
-            featureLabels.forEach((label, i) => {
-                if (parseInt(label.dataset.feature) === featureIndex) {
-                    label.classList.add('active');
-                } else {
-                    label.classList.remove('active');
-                }
-            });
-
-            featureScreenshots.forEach((screenshot, i) => {
-                if (parseInt(screenshot.dataset.feature) === featureIndex) {
-                    screenshot.classList.add('active');
-                } else {
-                    screenshot.classList.remove('active');
-                }
-            });
-        }
-
-        // Progress bar
-        const progressBar = document.getElementById('progressBar');
-        
-        function updateProgressBar() {
-            const scrollTop = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = (scrollTop / docHeight) * 100;
-            progressBar.style.width = scrollPercent + '%';
-        }
-
-        // Scroll event listeners
-        window.addEventListener('scroll', () => {
+            window.addEventListener('scroll', () => { updateFeatures(); updateProgressBar(); }, { passive: true });
             updateFeatures();
             updateProgressBar();
-        }, { passive: true });
-
-        // Initial calls
-        updateFeatures();
-        updateProgressBar();
-
-        // Resize handler
-        window.addEventListener('resize', () => {
-            updateFeatures();
         });
     </script>
 </body>
