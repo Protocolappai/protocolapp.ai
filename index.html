@@ -110,7 +110,7 @@
         .support-icon svg { width: 40px; height: 40px; }
         .support-card h2 { font-size: 36px; font-weight: 700; margin-bottom: 15px; }
         .support-card > p { font-size: 16px; color: var(--text-secondary); margin-bottom: 40px; }
-        .support-email { display: inline-flex; align-items: center; gap: 12px; background: rgba(64,166,115,0.1); border: 1px solid rgba(64,166,115,0.3); padding: 20px 40px; border-radius: 60px; font-size: 18px; font-weight: 600; color: var(--signal-green); transition: all 0.3s; }
+        .support-email { display: inline-flex; align-items: center; gap: 12px; background: rgba(64,166,115,0.1); border: 1px solid rgba(64,166,115,0.3); padding: 20px 40px; border-radius: 60px; font-size: 18px; font-weight: 600; color: var(--signal-green); transition: all 0.3s; word-break: break-all; max-width: 100%; box-sizing: border-box; }
         .support-email:hover { background: var(--signal-green); color: var(--system-black); transform: scale(1.05); }
 
         .faq-section { margin-top: 80px; }
@@ -164,6 +164,7 @@
             .features-grid { grid-template-columns: 1fr; }
             .stat-number { font-size: 48px; }
             .support-card { padding: 40px 25px; }
+            .support-email { padding: 16px 24px; font-size: 14px; }
             .footer-content { flex-direction: column; text-align: center; }
             .footer-links { flex-wrap: wrap; justify-content: center; gap: 20px; }
             .phone-showcase { padding: 0 20px; }
@@ -287,7 +288,7 @@
                     <div class="support-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
                     <h2>Need Help?</h2>
                     <p>We're here to help you get the most out of Protocol. Reach out anytime.</p>
-                    <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;" class="support-email">support@protocolaicoach.com</a>
+                    <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;" class="support-email"><span class="__cf_email__" data-cfemail="a2d1d7d2d2cdd0d6e2d2d0cdd6cdc1cdcec3cbc1cdc3c1ca8cc1cdcf">[email&#160;protected]</span></a>
                 </div>
                 <div class="faq-section">
                     <h3 class="faq-title">Frequently Asked Questions</h3>
@@ -320,7 +321,7 @@
                     <h2>Data Storage</h2>
                     <p>Your fitness data is stored locally on your device. Meal images are processed temporarily for AI analysis and are not stored on our servers.</p>
                     <h2>Contact</h2>
-                    <p>Email: <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;">support@protocolaicoach.com</a><br>Address: 1737 Winona Blvd, Los Angeles, CA 90027</p>
+                    <p>Email: <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;"><span class="__cf_email__" data-cfemail="44373134342b36300434362b302b272b28252d272b25272c6a272b29">[email&#160;protected]</span></a><br>Address: 1737 Winona Blvd, Los Angeles, CA 90027</p>
                 </div>
                 <a href="#" onclick="showPage('home'); return false;" class="back-btn">← Back to Home</a>
             </div>
@@ -339,7 +340,7 @@
                     <h2>Apple EULA</h2>
                     <p>This app is subject to <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/">Apple's Standard EULA</a>.</p>
                     <h2>Contact</h2>
-                    <p>Questions? <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;">support@protocolaicoach.com</a></p>
+                    <p>Questions? <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;"><span class="__cf_email__" data-cfemail="681b1d1818071a1c28181a071c070b070409010b07090b00460b0705">[email&#160;protected]</span></a></p>
                 </div>
                 <a href="#" onclick="showPage('home'); return false;" class="back-btn">← Back to Home</a>
             </div>
@@ -364,7 +365,7 @@
         <div class="footer-copy">© 2026 Protocol. All rights reserved.</div>
     </footer>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         function createDotGrid() {
             const c = document.getElementById('dotGrid');
             const cols = Math.floor(window.innerWidth / 50);
