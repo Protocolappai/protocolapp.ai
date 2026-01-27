@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support — Protocol</title>
+    <meta name="description" content="Get help and support for Protocol, a discipline-focused iOS fitness app.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --accent: #3ECFD4;
+            --accent-light: #5ED9DD;
+            --accent-glow: rgba(62, 207, 212, 0.5);
+            --accent-dim: rgba(62, 207, 212, 0.15);
+            --amber: #D4A03E;
+            --amber-light: #E8B84A;
+            --amber-glow: rgba(212, 160, 62, 0.5);
+            --terminal-green: #00FF41;
+            --terminal-glow: rgba(0, 255, 65, 0.5);
+            --text: #fff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --text-subtle: rgba(255, 255, 255, 0.4);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 1.25rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(to bottom, rgba(10, 10, 10, 0.98), rgba(10, 10, 10, 0));
+            backdrop-filter: blur(20px);
+            opacity: 0; transform: translateY(-20px);
+        }
+        .logo { height: 48px; width: auto; }
+        .nav-back {
+            display: flex; align-items: center; gap: 0.5rem;
+            color: var(--text-muted); text-decoration: none;
+            font-size: 0.875rem; font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .nav-back:hover { color: var(--accent); }
+        .nav-back svg { width: 18px; height: 18px; }
+
+        /* Hero */
+        .hero {
+            padding: 10rem 1.5rem 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 800px; height: 400px;
+            background: radial-gradient(ellipse, var(--accent-dim) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .hero-content {
+            position: relative; z-index: 1;
+            opacity: 0; transform: translateY(30px);
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -0.03em;
+        }
+        .hero h1 span { color: var(--amber); }
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Content */
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem 6rem;
+        }
+
+        /* Contact Card */
+        .contact-section {
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .contact-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+        }
+        .contact-card-icon {
+            width: 60px; height: 60px;
+            background: var(--accent-dim);
+            border: 1px solid rgba(62, 207, 212, 0.3);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        .contact-card-icon svg {
+            width: 28px; height: 28px;
+            color: var(--accent);
+        }
+        .contact-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+        }
+        .contact-card p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+        .contact-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--amber);
+            color: var(--bg);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px var(--amber-glow);
+        }
+        .contact-email:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 50px var(--amber-glow);
+        }
+        .contact-email svg {
+            width: 20px; height: 20px;
+        }
+        .response-time {
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .response-time::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--terminal-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--terminal-glow);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.8); }
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .section-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+        .section-header h2 span { color: var(--accent); }
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+        .faq-item:hover {
+            border-color: rgba(62, 207, 212, 0.3);
+        }
+        .faq-question {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .faq-question:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .faq-question::before {
+            content: '';
+            width: 8px; height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .faq-question h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            flex: 1;
+        }
+        .faq-toggle {
+            width: 24px; height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+        .faq-item.open .faq-toggle {
+            transform: rotate(45deg);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        .faq-item.open .faq-answer {
+            max-height: 500px;
+        }
+        .faq-answer-content {
+            padding: 0 1.5rem 1.25rem 2.5rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* App Info Section */
+        .app-info-section {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .app-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        .app-info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+        .app-info-card:hover {
+            border-color: rgba(62, 207, 212, 0.3);
+        }
+        .app-info-card h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-subtle);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+        .app-info-card p {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .app-info-card a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .app-info-card a:hover {
+            color: var(--accent-light);
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        .footer-content {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 1.5rem;
+            max-width: 1400px; margin: 0 auto;
+        }
+        .footer-links { display: flex; gap: 2rem; }
+        .footer-links a {
+            color: var(--text-muted); text-decoration: none;
+            font-size: 0.875rem; transition: color 0.3s ease;
+        }
+        .footer-links a:hover { color: var(--accent); }
+        .footer-copyright { color: var(--text-subtle); font-size: 0.8rem; }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed; bottom: 0; left: 0;
+            width: 100%; height: 3px;
+            background: rgba(255, 255, 255, 0.05); z-index: 1000;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent), var(--accent-light));
+            width: 0%;
+            box-shadow: 0 0 15px var(--accent-glow);
+            transition: width 0.1s ease;
+        }
+
+        /* Responsive */
+        @media (min-width: 900px) {
+            nav { padding: 1.5rem 4rem; }
+            .logo { height: 56px; }
+            .hero { padding: 12rem 4rem 5rem; }
+            .content { padding: 0 4rem 8rem; }
+            .footer-content { flex-direction: row; justify-content: space-between; }
+        }
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 2rem; }
+            .contact-card { padding: 1.5rem; }
+            .app-info-grid { grid-template-columns: 1fr; }
+            .contact-email { 
+                padding: 0.875rem 1.5rem; 
+                font-size: 0.9rem;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <img src="logo.png" alt="Protocol" class="logo">
+        <a href="index.html" class="nav-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Home
+        </a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Get <span>Support</span></h1>
+            <p>We're here to help you get the most out of Protocol. Reach out with any questions or feedback.</p>
+        </div>
+    </section>
+
+    <main class="content">
+        <!-- Contact Section -->
+        <div class="contact-section">
+            <div class="contact-card">
+                <div class="contact-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                </div>
+                <h2>Contact Us</h2>
+                <p>Have a question, issue, or feedback? Send us an email and we'll get back to you as soon as possible.</p>
+                <a href="mailto:support@protocolaicoach.com" class="contact-email">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    support@protocolaicoach.com
+                </a>
+                <div class="response-time">Typical response time: within 24-48 hours</div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <div class="section-header">
+                <h2>Frequently Asked <span>Questions</span></h2>
+                <p>Quick answers to common questions about Protocol.</p>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>How do I create an account?</h3>
+                        <div class="faq-toggle">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Download Protocol from the App Store and open the app. You'll be guided through an onboarding process where you can create your account using your email address or Sign in with Apple. Follow the prompts to set up your profile and fitness goals.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>How does the AI meal scanning work?</h3>
+                        <div class="faq-toggle">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Simply point your camera at your meal and take a photo. Our AI analyzes the image to identify foods and estimate portion sizes, then calculates approximate macros (protein, carbs, fats) and calories. You can review and adjust the estimates before logging.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>How do I cancel my subscription?</h3>
+                        <div class="faq-toggle">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Subscriptions are managed through Apple. To cancel: Open Settings on your iPhone → Tap your name → Subscriptions → Select Protocol → Tap Cancel Subscription. You'll continue to have access until the end of your current billing period.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>How do I delete my account and data?</h3>
+                        <div class="faq-toggle">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            You can request account deletion by emailing support@protocolaicoach.com with the subject "Account Deletion Request". Please include the email address associated with your account. We will process your request and permanently delete all your data within 30 days.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Is my health data secure?</h3>
+                        <div class="faq-toggle">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Yes. We take your privacy seriously. Your health and fitness data is encrypted and stored securely. We do not sell your personal information to third parties. For complete details, please review our <a href="privacy.html">Privacy Policy</a>.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What devices are supported?</h3>
+                        <div class="faq-toggle">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Protocol is available for iPhone running iOS 16.0 or later. The app is optimized for all iPhone models from iPhone X onwards. Apple Watch integration is available for tracking workouts and activity data.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>How do I restore my purchases?</h3>
+                        <div class="faq-toggle">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            If you've previously subscribed and need to restore your purchase, go to the app's settings and tap "Restore Purchases". Make sure you're signed in with the same Apple ID used for the original purchase. If you continue to have issues, contact us at support@protocolaicoach.com.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Info Section -->
+        <div class="app-info-section">
+            <div class="section-header">
+                <h2>App <span>Information</span></h2>
+            </div>
+            <div class="app-info-grid">
+                <div class="app-info-card">
+                    <h3>Developer</h3>
+                    <p>Protocol</p>
+                </div>
+                <div class="app-info-card">
+                    <h3>Platform</h3>
+                    <p>iOS 16.0+</p>
+                </div>
+                <div class="app-info-card">
+                    <h3>Website</h3>
+                    <p><a href="https://protocolapp.ai">protocolapp.ai</a></p>
+                </div>
+                <div class="app-info-card">
+                    <h3>Support Email</h3>
+                    <p><a href="mailto:support@protocolaicoach.com">support@protocolaicoach.com</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" rel="noopener">Terms</a>
+                <a href="support.html">Support</a>
+            </div>
+            <div class="footer-copyright">© 2026 Protocol</div>
+        </div>
+    </footer>
+
+    <div class="progress-bar"><div class="progress-bar-fill" id="progressBar"></div></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Nav animation
+            anime({
+                targets: 'nav',
+                opacity: [0, 1],
+                translateY: [-20, 0],
+                duration: 800,
+                easing: 'easeOutExpo',
+                delay: 200
+            });
+
+            // Hero animation
+            anime({
+                targets: '.hero-content',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 1000,
+                easing: 'easeOutExpo',
+                delay: 400
+            });
+
+            // Content sections animation
+            const sections = document.querySelectorAll('.contact-section, .faq-section, .app-info-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        anime({
+                            targets: entry.target,
+                            opacity: [0, 1],
+                            translateY: [20, 0],
+                            duration: 800,
+                            easing: 'easeOutExpo'
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+            sections.forEach(section => observer.observe(section));
+
+            // FAQ accordion
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    const isOpen = item.classList.contains('open');
+                    // Close all other items
+                    faqItems.forEach(i => i.classList.remove('open'));
+                    // Toggle current item
+                    if (!isOpen) {
+                        item.classList.add('open');
+                    }
+                });
+            });
+
+            // Progress bar
+            const progressBar = document.getElementById('progressBar');
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollPercent = (scrollTop / docHeight) * 100;
+                progressBar.style.width = scrollPercent + '%';
+            }, { passive: true });
+        });
+    </script>
+</body>
+</html>
