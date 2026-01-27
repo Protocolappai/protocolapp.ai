@@ -4,158 +4,137 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protocol — Strength In Structure</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="description" content="A discipline-focused fitness app with AI meal scanning, workout tracking, and personalized coaching.">
+    <meta property="og:image" content="https://protocolapp.ai/og-image.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
+        :root { --accent: #D4A03E; --accent-light: #E8B84A; --accent-glow: rgba(212,160,62,0.5); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; overflow-x: hidden; }
-        
-        /* Accent: Amber Gold */
-        :root {
-            --accent: #D4A03E;
-            --accent-light: #E8B84A;
-            --accent-glow: rgba(212, 160, 62, 0.5);
-        }
-        
+
         /* Progress Bar */
-        .progress-bar { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width: 300px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; z-index: 100; }
-        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); border-radius: 2px; transition: width 0.1s; }
-        .progress-marker { position: absolute; top: -8px; width: 20px; height: 20px; background: var(--accent); border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 20px var(--accent-glow); left: 0%; transition: left 0.1s; }
+        .progress-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 280px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; z-index: 100; }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); border-radius: 2px; }
+        .progress-marker { position: absolute; top: -6px; width: 15px; height: 15px; background: var(--accent); border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 15px var(--accent-glow); left: 0%; }
 
-        /* Navigation */
-        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 30px 60px; display: flex; justify-content: space-between; align-items: center; mix-blend-mode: difference; }
-        .logo { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
-        .nav-link { font-size: 14px; font-weight: 500; color: #fff; text-decoration: none; opacity: 0.7; transition: opacity 0.3s; }
-        .nav-link:hover { opacity: 1; }
+        /* Nav */
+        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 25px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo img { height: 36px; }
+        .nav-link { font-size: 14px; font-weight: 600; color: #fff; text-decoration: none; opacity: 0.8; }
+        .nav-link:hover { opacity: 1; color: var(--accent); }
 
-        /* Section base */
-        section { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; }
+        /* HERO */
+        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 100px 40px 60px; position: relative; }
+        .hero-content { display: flex; align-items: center; justify-content: center; gap: 80px; max-width: 1200px; width: 100%; }
+        .hero-text { flex: 1; max-width: 500px; }
+        .hero-title { font-size: 72px; font-weight: 800; line-height: 1.05; margin-bottom: 24px; }
+        .hero-title .accent { color: var(--accent); }
+        .hero-subtitle { font-size: 18px; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 40px; }
+        .hero-cta { display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: #000; padding: 16px 32px; border-radius: 50px; font-weight: 600; text-decoration: none; transition: all 0.3s; }
+        .hero-cta:hover { transform: translateY(-3px); box-shadow: 0 15px 30px var(--accent-glow); }
+        .hero-cta svg { width: 20px; height: 20px; }
 
-        /* HERO - Morphing Logo */
-        .hero { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .hero-text { position: absolute; left: 60px; top: 50%; transform: translateY(-50%); z-index: 10; }
-        .hero-title { font-size: 80px; font-weight: 800; line-height: 1; }
-        .hero-title span { display: block; opacity: 0; transform: translateY(40px); }
-        .hero-subtitle { font-size: 18px; color: rgba(255,255,255,0.5); margin-top: 30px; max-width: 400px; line-height: 1.7; opacity: 0; }
-        
-        /* Central morphing shape */
-        .morph-container { position: relative; width: 500px; height: 500px; }
-        .morph-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 2px solid; border-radius: 50%; }
-        .ring-1 { width: 300px; height: 300px; border-color: rgba(212,160,62,0.3); }
-        .ring-2 { width: 400px; height: 400px; border-color: rgba(212,160,62,0.2); }
-        .ring-3 { width: 500px; height: 500px; border-color: rgba(212,160,62,0.1); }
-        
+        /* Morph Animation */
+        .morph-container { position: relative; width: 400px; height: 400px; flex-shrink: 0; }
+        .morph-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px solid; border-radius: 50%; }
+        .ring-1 { width: 250px; height: 250px; border-color: rgba(212,160,62,0.25); }
+        .ring-2 { width: 320px; height: 320px; border-color: rgba(212,160,62,0.15); }
+        .ring-3 { width: 400px; height: 400px; border-color: rgba(212,160,62,0.08); }
         .morph-dots { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .morph-dot { position: absolute; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 15px var(--accent-glow); }
-        
+        .morph-dot { position: absolute; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent-glow); }
         .center-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .center-icon svg { width: 80px; height: 80px; fill: none; stroke: var(--accent); stroke-width: 1.5; }
+        .center-icon svg { width: 60px; height: 60px; fill: none; stroke: var(--accent); stroke-width: 1.5; }
 
-        /* FEATURES - Exploded Phone */
-        .features { min-height: 400vh; position: relative; }
-        .features-sticky { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; justify-content: center; width: 100%; }
-        
-        .exploded-phone { position: relative; width: 800px; height: 600px; display: flex; align-items: center; justify-content: center; }
-        
-        .phone-layer { position: absolute; transition: all 0.1s ease-out; }
-        .phone-frame { width: 280px; height: 560px; background: linear-gradient(145deg, #1a1a1a, #0d0d0d); border-radius: 45px; border: 2px solid rgba(255,255,255,0.1); position: relative; }
-        .phone-screen { width: 260px; height: 540px; background: #000; border-radius: 38px; overflow: hidden; position: absolute; left: 10px; top: 10px; }
-        .phone-screen img { width: 100%; height: 100%; object-fit: cover; opacity: 0; position: absolute; transition: opacity 0.5s; }
+        /* FEATURES */
+        .features { min-height: 350vh; position: relative; }
+        .features-sticky { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .features-inner { display: flex; align-items: center; justify-content: center; width: 100%; max-width: 1200px; padding: 0 40px; gap: 60px; }
+        .feature-labels { width: 280px; }
+        .feature-label { margin-bottom: 40px; opacity: 0.2; transform: translateX(-20px); transition: all 0.4s ease; }
+        .feature-label.active { opacity: 1; transform: translateX(0); }
+        .feature-label h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .feature-label h3::before { content: ''; width: 40px; height: 2px; background: var(--accent); }
+        .feature-label p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.6; padding-left: 52px; }
+
+        .phone-wrapper { position: relative; }
+        .phone-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; height: 350px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); filter: blur(50px); z-index: -1; }
+        .phone-frame { width: 260px; height: 520px; background: linear-gradient(145deg, #1a1a1a, #0d0d0d); border-radius: 40px; padding: 8px; border: 1px solid rgba(255,255,255,0.1); position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.5); }
+        .phone-notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 80px; height: 22px; background: #0d0d0d; border-radius: 12px; z-index: 10; }
+        .phone-screen { width: 100%; height: 100%; background: #000; border-radius: 34px; overflow: hidden; position: relative; }
+        .phone-screen img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s ease; }
         .phone-screen img.active { opacity: 1; }
-        .phone-notch { width: 100px; height: 30px; left: 50%; top: 15px; transform: translateX(-50%); background: #0d0d0d; border-radius: 0 0 20px 20px; position: absolute; z-index: 10; }
-        .phone-glow { width: 400px; height: 400px; left: 50%; top: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); filter: blur(60px); position: absolute; z-index: -1; }
 
-        /* Feature Labels with connecting lines */
-        .feature-label { position: absolute; opacity: 0; transition: all 0.5s; }
-        .feature-label.active { opacity: 1; }
-        .feature-label h3 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-        .feature-label p { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 250px; line-height: 1.6; }
-        .feature-label .line { position: absolute; height: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
-        .feature-label .dot { position: absolute; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 15px var(--accent-glow); }
+        /* STATS */
+        .stats { padding: 120px 40px; background: linear-gradient(180deg, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%); }
+        .stats-grid { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; text-align: center; }
+        .stat-number { font-size: 52px; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+        .stat-label { font-size: 13px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
 
-        .label-1 { left: 80px; top: 20%; }
-        .label-1 .line { width: 150px; right: -160px; top: 15px; }
-        .label-1 .dot { right: -170px; top: 10px; }
-
-        .label-2 { left: 80px; top: 45%; }
-        .label-2 .line { width: 120px; right: -130px; top: 15px; }
-        .label-2 .dot { right: -140px; top: 10px; }
-
-        .label-3 { left: 80px; top: 70%; }
-        .label-3 .line { width: 150px; right: -160px; top: 15px; }
-        .label-3 .dot { right: -170px; top: 10px; }
-
-        .label-4 { right: 80px; top: 20%; text-align: right; }
-        .label-4 .line { width: 150px; left: -160px; top: 15px; background: linear-gradient(270deg, var(--accent), transparent); }
-        .label-4 .dot { left: -170px; top: 10px; }
-
-        .label-5 { right: 80px; top: 45%; text-align: right; }
-        .label-5 .line { width: 120px; left: -130px; top: 15px; background: linear-gradient(270deg, var(--accent), transparent); }
-        .label-5 .dot { left: -140px; top: 10px; }
-
-        .label-6 { right: 80px; top: 70%; text-align: right; }
-        .label-6 .line { width: 150px; left: -160px; top: 15px; background: linear-gradient(270deg, var(--accent), transparent); }
-        .label-6 .dot { left: -170px; top: 10px; }
-
-        /* Stats Section */
-        .stats { background: linear-gradient(180deg, #0a0a0a 0%, #111 100%); padding: 150px 60px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 60px; max-width: 1200px; margin: 0 auto; }
-        .stat { text-align: center; opacity: 0; transform: translateY(40px); }
-        .stat-number { font-size: 72px; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .stat-label { font-size: 14px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; margin-top: 10px; }
-
-        /* CTA Section */
-        .cta { background: linear-gradient(180deg, #111 0%, #0a0a0a 100%); text-align: center; padding: 150px 60px; }
-        .cta h2 { font-size: 64px; font-weight: 800; margin-bottom: 30px; opacity: 0; transform: translateY(40px); }
-        .cta p { font-size: 18px; color: rgba(255,255,255,0.6); margin-bottom: 50px; opacity: 0; }
-        .cta-buttons { display: flex; gap: 20px; justify-content: center; opacity: 0; }
-        .btn { padding: 20px 50px; border-radius: 60px; font-size: 16px; font-weight: 600; text-decoration: none; transition: all 0.4s; }
+        /* CTA */
+        .cta { padding: 120px 40px; text-align: center; }
+        .cta h2 { font-size: 48px; font-weight: 800; margin-bottom: 20px; }
+        .cta p { font-size: 18px; color: rgba(255,255,255,0.5); margin-bottom: 40px; }
+        .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 16px 36px; border-radius: 50px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.3s; }
         .btn-primary { background: var(--accent); color: #000; }
-        .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 20px 40px var(--accent-glow); }
-        .btn-secondary { border: 2px solid rgba(255,255,255,0.2); color: #fff; }
-        .btn-secondary:hover { border-color: var(--accent); background: rgba(212,160,62,0.1); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 30px var(--accent-glow); }
+        .btn-secondary { border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+        .btn-secondary:hover { border-color: var(--accent); }
 
         /* Footer */
-        footer { padding: 60px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .footer-links { display: flex; gap: 40px; }
+        footer { padding: 50px 40px 30px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .footer-content { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .footer-links { display: flex; gap: 30px; }
         .footer-links a { font-size: 14px; color: rgba(255,255,255,0.5); text-decoration: none; }
         .footer-links a:hover { color: var(--accent); }
         .footer-copy { font-size: 13px; color: rgba(255,255,255,0.3); }
 
-        /* Mobile */
-        @media (max-width: 1024px) {
-            .hero-text { left: 40px; }
-            .hero-title { font-size: 56px; }
-            .morph-container { width: 350px; height: 350px; }
-            .ring-1 { width: 200px; height: 200px; }
-            .ring-2 { width: 280px; height: 280px; }
-            .ring-3 { width: 350px; height: 350px; }
-            .feature-label { display: none; }
-            .exploded-phone { width: 100%; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 40px; }
-        }
-        @media (max-width: 768px) {
-            nav { padding: 20px 30px; }
-            .hero-text { position: relative; left: 0; transform: none; text-align: center; padding: 0 30px; }
-            .hero-title { font-size: 42px; }
-            .hero-subtitle { margin: 20px auto 40px; }
-            .morph-container { width: 280px; height: 280px; margin-top: 40px; }
-            .progress-bar { width: 200px; bottom: 20px; }
-            .phone-frame { width: 220px; height: 440px; }
-            .phone-screen { width: 200px; height: 420px; }
-            .cta h2 { font-size: 36px; }
-            .cta-buttons { flex-direction: column; align-items: center; }
-            .stats { padding: 80px 30px; }
-            .stat-number { font-size: 48px; }
-            footer { flex-direction: column; gap: 30px; text-align: center; }
+        /* MOBILE */
+        @media (max-width: 900px) {
+            .hero-content { flex-direction: column; text-align: center; gap: 50px; }
+            .hero-text { max-width: 100%; }
+            .hero-title { font-size: 48px; }
+            .morph-container { width: 300px; height: 300px; }
+            .ring-1 { width: 180px; height: 180px; }
+            .ring-2 { width: 240px; height: 240px; }
+            .ring-3 { width: 300px; height: 300px; }
+            .features { min-height: auto; }
+            .features-sticky { position: relative; height: auto; padding: 80px 0; }
+            .features-inner { flex-direction: column; gap: 40px; }
+            .feature-labels { width: 100%; max-width: 350px; }
+            .feature-label { opacity: 1; transform: none; margin-bottom: 24px; }
+            .feature-label h3::before { width: 24px; }
+            .feature-label p { padding-left: 36px; }
+            .phone-wrapper { order: -1; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 30px; }
+            .stat-number { font-size: 40px; }
+            .cta h2 { font-size: 32px; }
+            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
             .footer-links { flex-wrap: wrap; justify-content: center; }
+        }
+        @media (max-width: 500px) {
+            nav { padding: 20px; }
+            .hero { padding: 90px 20px 50px; }
+            .hero-title { font-size: 38px; }
+            .hero-subtitle { font-size: 16px; }
+            .morph-container { width: 260px; height: 260px; }
+            .ring-1 { width: 160px; height: 160px; }
+            .ring-2 { width: 210px; height: 210px; }
+            .ring-3 { width: 260px; height: 260px; }
+            .phone-frame { width: 220px; height: 440px; }
+            .features-inner { padding: 0 20px; }
+            .stats { padding: 80px 20px; }
+            .cta { padding: 80px 20px; }
+            .progress-bar { width: 180px; bottom: 20px; }
+            footer { padding: 40px 20px 20px; }
         }
     </style>
 </head>
 <body>
     <nav>
-        <div class="logo"><img src="logo.png" alt="Protocol" style="height: 40px;"></div>
+        <div class="logo"><img src="logo.png" alt="Protocol"></div>
         <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="nav-link">Download →</a>
     </nav>
 
@@ -165,89 +144,80 @@
     </div>
 
     <section class="hero">
-        <div class="hero-text">
-            <h1 class="hero-title">
-                <span>Strength</span>
-                <span>In</span>
-                <span style="color: var(--accent)">Structure</span>
-            </h1>
-            <p class="hero-subtitle">A discipline-focused fitness app. AI meal scanning. Workout tracking. No noise. Just results.</p>
-        </div>
-        <div class="morph-container">
-            <div class="morph-ring ring-1"></div>
-            <div class="morph-ring ring-2"></div>
-            <div class="morph-ring ring-3"></div>
-            <div class="morph-dots" id="morphDots"></div>
-            <div class="center-icon">
-                <svg viewBox="0 0 100 100">
-                    <polygon id="morphShape" points="50,10 90,90 10,90" />
-                </svg>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">Strength In<br><span class="accent">Structure</span></h1>
+                <p class="hero-subtitle">A discipline-focused fitness app with AI meal scanning, workout tracking, and personalized coaching. No noise. Just results.</p>
+                <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="hero-cta">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                    Download for iOS
+                </a>
+            </div>
+            <div class="morph-container">
+                <div class="morph-ring ring-1"></div>
+                <div class="morph-ring ring-2"></div>
+                <div class="morph-ring ring-3"></div>
+                <div class="morph-dots" id="morphDots"></div>
+                <div class="center-icon">
+                    <svg viewBox="0 0 100 100"><polygon id="morphShape" points="50,15 85,85 15,85"/></svg>
+                </div>
             </div>
         </div>
     </section>
 
     <section class="features" id="features">
         <div class="features-sticky">
-            <div class="exploded-phone">
-                <div class="phone-glow"></div>
-                <div class="phone-frame" id="phoneFrame">
-                    <div class="phone-notch" id="phoneNotch"></div>
-                    <div class="phone-screen" id="phoneScreen">
-                        <img src="feature-meal.png" class="active" data-index="0">
-                        <img src="feature-workout.png" data-index="1">
-                        <img src="feature-coach.png" data-index="2">
-                        <img src="feature-progress.png" data-index="3">
-                        <img src="feature-calorie.png" data-index="4">
-                        <img src="feature-bodyscan.png" data-index="5">
+            <div class="features-inner">
+                <div class="feature-labels" id="featureLabels">
+                    <div class="feature-label active" data-index="0">
+                        <h3>AI Meal Scanning</h3>
+                        <p>Point. Shoot. Logged. Instant macro estimates from any meal photo.</p>
+                    </div>
+                    <div class="feature-label" data-index="1">
+                        <h3>Workout Tracking</h3>
+                        <p>Log sets, track PRs, monitor volume with analytics that matter.</p>
+                    </div>
+                    <div class="feature-label" data-index="2">
+                        <h3>AI Coach</h3>
+                        <p>Contextual guidance that knows your goals and constraints.</p>
+                    </div>
+                    <div class="feature-label" data-index="3">
+                        <h3>Progress Analytics</h3>
+                        <p>Weekly trends and compliance tracking. Data interpreted.</p>
+                    </div>
+                    <div class="feature-label" data-index="4">
+                        <h3>Calorie Cycling</h3>
+                        <p>Intelligent high/low day distribution for your weekly budget.</p>
+                    </div>
+                    <div class="feature-label" data-index="5">
+                        <h3>Body Scans</h3>
+                        <p>AI composition analysis. Protein targets from lean mass.</p>
                     </div>
                 </div>
-            </div>
-
-            <div class="feature-label label-1" data-index="0">
-                <h3>AI Meal Scanning</h3>
-                <p>Point. Shoot. Logged. Instant macro breakdown from any photo.</p>
-                <div class="line"></div>
-                <div class="dot"></div>
-            </div>
-            <div class="feature-label label-2" data-index="1">
-                <h3>Workout Tracking</h3>
-                <p>Log sets, track PRs, monitor volume progression.</p>
-                <div class="line"></div>
-                <div class="dot"></div>
-            </div>
-            <div class="feature-label label-3" data-index="2">
-                <h3>AI Coach</h3>
-                <p>Contextual guidance that understands your goals.</p>
-                <div class="line"></div>
-                <div class="dot"></div>
-            </div>
-            <div class="feature-label label-4" data-index="3">
-                <h3>Progress Analytics</h3>
-                <p>Weekly trends. Compliance tracking. Data interpreted.</p>
-                <div class="line"></div>
-                <div class="dot"></div>
-            </div>
-            <div class="feature-label label-5" data-index="4">
-                <h3>Calorie Cycling</h3>
-                <p>Strategic high/low day distribution.</p>
-                <div class="line"></div>
-                <div class="dot"></div>
-            </div>
-            <div class="feature-label label-6" data-index="5">
-                <h3>Body Scans</h3>
-                <p>AI composition analysis. Protein targets from lean mass.</p>
-                <div class="line"></div>
-                <div class="dot"></div>
+                <div class="phone-wrapper">
+                    <div class="phone-glow"></div>
+                    <div class="phone-frame">
+                        <div class="phone-notch"></div>
+                        <div class="phone-screen">
+                            <img src="feature-meal.png" class="active" data-index="0">
+                            <img src="feature-workout.png" data-index="1">
+                            <img src="feature-coach.png" data-index="2">
+                            <img src="feature-progress.png" data-index="3">
+                            <img src="feature-calorie.png" data-index="4">
+                            <img src="feature-bodyscan.png" data-index="5">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <section class="stats">
         <div class="stats-grid">
-            <div class="stat"><div class="stat-number">6</div><div class="stat-label">Core Features</div></div>
-            <div class="stat"><div class="stat-number">100%</div><div class="stat-label">Privacy Focused</div></div>
-            <div class="stat"><div class="stat-number">0</div><div class="stat-label">Ads Ever</div></div>
-            <div class="stat"><div class="stat-number">24/7</div><div class="stat-label">AI Coach</div></div>
+            <div><div class="stat-number">6</div><div class="stat-label">Features</div></div>
+            <div><div class="stat-number">100%</div><div class="stat-label">Private</div></div>
+            <div><div class="stat-number">0</div><div class="stat-label">Ads</div></div>
+            <div><div class="stat-number">24/7</div><div class="stat-label">AI Coach</div></div>
         </div>
     </section>
 
@@ -261,18 +231,20 @@
     </section>
 
     <footer>
-        <div class="footer-links">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;">Support</a>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#" onclick="window.location.href='mailto:support@protocolaicoach.com'; return false;">Support</a>
+            </div>
+            <div class="footer-copy">© 2026 Protocol</div>
         </div>
-        <div class="footer-copy">© 2026 Protocol. All rights reserved.</div>
     </footer>
 
     <script>
-        // Create morphing dots
+        // Create morph dots
         const dotsContainer = document.getElementById('morphDots');
-        const numDots = 36;
+        const numDots = 30;
         for (let i = 0; i < numDots; i++) {
             const dot = document.createElement('div');
             dot.className = 'morph-dot';
@@ -280,115 +252,74 @@
         }
         const dots = document.querySelectorAll('.morph-dot');
 
-        // Animate dots in circle
+        // Animate dots
         function animateDots(progress) {
-            const radius = 120 + Math.sin(progress * Math.PI) * 30;
+            const radius = 100 + Math.sin(progress * Math.PI * 2) * 20;
             dots.forEach((dot, i) => {
-                const angle = (i / numDots) * Math.PI * 2 + progress * 2;
-                const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius;
-                dot.style.transform = `translate(${x}px, ${y}px)`;
+                const angle = (i / numDots) * Math.PI * 2 + progress * 3;
+                dot.style.transform = `translate(${Math.cos(angle) * radius}px, ${Math.sin(angle) * radius}px)`;
             });
         }
 
-        // Morph the center shape
-        function morphShape(progress) {
-            const shape = document.getElementById('morphShape');
-            const p = progress * 2 % 1;
-            
-            // Triangle -> Diamond -> Circle-ish -> back
-            if (progress < 0.33) {
-                const t = progress / 0.33;
-                shape.setAttribute('points', `50,${10 + t * 20} ${90 - t * 20},${90 - t * 40} ${10 + t * 20},${90 - t * 40}`);
-            } else if (progress < 0.66) {
-                const t = (progress - 0.33) / 0.33;
-                shape.setAttribute('points', `50,30 70,50 50,70 30,50`);
-            } else {
-                const t = (progress - 0.66) / 0.34;
-                shape.setAttribute('points', `50,${30 - t * 20} ${70 + t * 20},${50 + t * 40} ${50},${70 + t * 20} ${30 - t * 20},${50 + t * 40}`);
-            }
-        }
+        // Ring rotation
+        anime({ targets: '.ring-1', rotate: 360, duration: 25000, loop: true, easing: 'linear' });
+        anime({ targets: '.ring-2', rotate: -360, duration: 35000, loop: true, easing: 'linear' });
+        anime({ targets: '.ring-3', rotate: 360, duration: 50000, loop: true, easing: 'linear' });
 
-        // Hero animations
-        anime({ targets: '.hero-title span', opacity: [0, 1], translateY: [40, 0], delay: anime.stagger(150, {start: 500}), duration: 1000, easing: 'easeOutExpo' });
-        anime({ targets: '.hero-subtitle', opacity: [0, 1], translateY: [20, 0], delay: 1200, duration: 800, easing: 'easeOutExpo' });
-        
-        // Ring animations
-        anime({ targets: '.ring-1', rotate: 360, duration: 20000, loop: true, easing: 'linear' });
-        anime({ targets: '.ring-2', rotate: -360, duration: 30000, loop: true, easing: 'linear' });
-        anime({ targets: '.ring-3', rotate: 360, duration: 40000, loop: true, easing: 'linear' });
-
-        // Features section
-        const featuresSection = document.querySelector('.features');
-        const phoneFrame = document.getElementById('phoneFrame');
-        const phoneScreen = document.getElementById('phoneScreen');
-        const phoneNotch = document.getElementById('phoneNotch');
-        const phoneImages = document.querySelectorAll('.phone-screen img');
+        // Features
         const featureLabels = document.querySelectorAll('.feature-label');
-        let currentFeature = -1;
+        const phoneImages = document.querySelectorAll('.phone-screen img');
+        const featuresSection = document.querySelector('.features');
+        const isMobile = window.innerWidth <= 900;
+        let currentFeature = 0;
 
-        function updateFeatures(progress) {
-            // Explode effect
-            const explode = Math.sin(progress * Math.PI) * 50;
-            phoneFrame.style.transform = `translate(-50%, -50%) rotateY(${progress * 10}deg)`;
-            phoneNotch.style.transform = `translateX(-50%) translateY(${-explode * 0.5}px)`;
-            
-            // Feature switching
-            const featureIndex = Math.min(5, Math.floor(progress * 6));
-            if (featureIndex !== currentFeature) {
-                currentFeature = featureIndex;
-                phoneImages.forEach((img, i) => img.classList.toggle('active', i === featureIndex));
-                featureLabels.forEach((label, i) => label.classList.toggle('active', i === featureIndex));
+        function setFeature(index) {
+            if (index === currentFeature) return;
+            currentFeature = index;
+            featureLabels.forEach((l, i) => l.classList.toggle('active', i === index));
+            phoneImages.forEach((img, i) => img.classList.toggle('active', i === index));
+            if (!isMobile) {
+                anime({ targets: '.phone-frame', scale: [0.97, 1], duration: 300, easing: 'easeOutQuad' });
             }
         }
-
-        // Stats animation
-        const statsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    anime({ targets: '.stat', opacity: [0, 1], translateY: [40, 0], delay: anime.stagger(100), duration: 800, easing: 'easeOutExpo' });
-                    statsObserver.disconnect();
-                }
-            });
-        }, { threshold: 0.3 });
-        statsObserver.observe(document.querySelector('.stats'));
-
-        // CTA animation
-        const ctaObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    anime({ targets: '.cta h2', opacity: [0, 1], translateY: [40, 0], duration: 800, easing: 'easeOutExpo' });
-                    anime({ targets: '.cta p', opacity: [0, 1], delay: 200, duration: 800, easing: 'easeOutExpo' });
-                    anime({ targets: '.cta-buttons', opacity: [0, 1], delay: 400, duration: 800, easing: 'easeOutExpo' });
-                    ctaObserver.disconnect();
-                }
-            });
-        }, { threshold: 0.3 });
-        ctaObserver.observe(document.querySelector('.cta'));
 
         // Scroll handler
+        let ticking = false;
         window.addEventListener('scroll', () => {
-            const scrollY = window.scrollY;
-            const maxScroll = document.body.scrollHeight - window.innerHeight;
-            const progress = scrollY / maxScroll;
-            
-            // Progress bar
-            document.querySelector('.progress-fill').style.width = (progress * 100) + '%';
-            document.querySelector('.progress-marker').style.left = (progress * 100) + '%';
-            
-            // Hero morphing
-            animateDots(progress);
-            morphShape(progress);
-            
-            // Features section
-            const featRect = featuresSection.getBoundingClientRect();
-            const featProgress = Math.max(0, Math.min(1, -featRect.top / (featuresSection.offsetHeight - window.innerHeight)));
-            if (featProgress > 0 && featProgress < 1) {
-                updateFeatures(featProgress);
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    const scrollY = window.scrollY;
+                    const maxScroll = document.body.scrollHeight - window.innerHeight;
+                    const progress = scrollY / maxScroll;
+
+                    // Progress bar
+                    document.querySelector('.progress-fill').style.width = (progress * 100) + '%';
+                    document.querySelector('.progress-marker').style.left = (progress * 100) + '%';
+
+                    // Morph animation
+                    animateDots(progress);
+
+                    // Features (desktop only)
+                    if (!isMobile) {
+                        const rect = featuresSection.getBoundingClientRect();
+                        const sectionProgress = Math.max(0, Math.min(1, -rect.top / (featuresSection.offsetHeight - window.innerHeight)));
+                        if (sectionProgress >= 0 && sectionProgress <= 1) {
+                            const index = Math.min(5, Math.floor(sectionProgress * 6));
+                            setFeature(index);
+                        }
+                    }
+                    ticking = false;
+                });
+                ticking = true;
             }
         });
 
-        // Initial dot animation
+        // Click labels to switch
+        featureLabels.forEach(label => {
+            label.addEventListener('click', () => setFeature(parseInt(label.dataset.index)));
+        });
+
+        // Initial
         animateDots(0);
     </script>
 </body>
