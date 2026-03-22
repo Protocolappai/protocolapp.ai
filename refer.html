@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocol — You've Been Invited</title>
+    <meta name="description" content="Join Protocol — the discipline-focused fitness app. AI meal scanning, workout tracking, and real coaching.">
+    <meta property="og:title" content="Protocol — You've Been Invited">
+    <meta property="og:description" content="Join Protocol — the discipline-focused fitness app.">
+    <meta property="og:image" content="/og-image.png">
+    <!-- Smart App Banner: update app-id once live in the App Store -->
+    <meta name="apple-itunes-app" content="app-id=0000000000">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 24px;
+            text-align: center;
+        }
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+        .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #00ff88;
+            box-shadow: 0 0 6px #00ff88;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .status-text {
+            font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            color: #00ff88;
+            text-transform: uppercase;
+        }
+        h1 {
+            font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+        .subtitle {
+            font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+        }
+        .referral-tag {
+            font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
+            font-size: 10px;
+            color: #00ff88;
+            background: rgba(0,255,136,0.08);
+            border: 1px solid rgba(0,255,136,0.2);
+            border-radius: 6px;
+            padding: 10px 20px;
+            margin-bottom: 36px;
+            letter-spacing: 0.8px;
+        }
+        .cta {
+            display: inline-block;
+            background: #fff;
+            color: #000;
+            font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            padding: 14px 36px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .cta:active { transform: scale(0.97); }
+        .cta:hover { opacity: 0.9; }
+        .footer {
+            margin-top: 40px;
+            font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
+            font-size: 9px;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 0.5px;
+        }
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+
+    <div class="status">
+        <div class="dot"></div>
+        <span class="status-text">System Online</span>
+    </div>
+
+    <h1>PROTOCOL</h1>
+    <div class="subtitle">Compliance Engine</div>
+
+    <div class="referral-tag" id="referralTag">LOADING…</div>
+
+    <!-- Update this URL once the app is live in the App Store -->
+    <a class="cta" id="downloadBtn" href="https://apps.apple.com/app/protocol-compliance-engine/id0000000000">
+        Download on the App Store
+    </a>
+
+    <div class="footer">Your referral will be applied automatically</div>
+
+    <script>
+        (function() {
+            // Extract the influencer handle from the URL path.
+            // Supports: /refer/handle, /r/handle
+            var parts = window.location.pathname.replace(/^\/+|\/+$/g, '').split('/');
+            var handle = '';
+            if (parts.length >= 2 && (parts[0] === 'refer' || parts[0] === 'r')) {
+                handle = decodeURIComponent(parts[1]).toLowerCase().trim();
+            }
+
+            if (!handle) {
+                document.getElementById('referralTag').textContent = 'INVALID REFERRAL LINK';
+                return;
+            }
+
+            // Show the influencer handle
+            document.getElementById('referralTag').textContent = 'INVITED BY @' + handle.toUpperCase();
+
+            // Update Smart App Banner meta tag with deep link argument
+            var metaTag = document.querySelector('meta[name="apple-itunes-app"]');
+            if (metaTag) {
+                var appId = metaTag.getAttribute('content').match(/app-id=(\d+)/);
+                var id = appId ? appId[1] : '0000000000';
+                metaTag.setAttribute('content',
+                    'app-id=' + id + ', app-argument=protocol://refer?code=' + handle
+                );
+            }
+
+            // Store referral code in localStorage for reference
+            try {
+                localStorage.setItem('protocol_referral_code', handle);
+                localStorage.setItem('protocol_referral_ts', new Date().toISOString());
+            } catch(e) {}
+
+            // Copy to clipboard for deferred deep link pickup on first app launch.
+            // ReferralManager.checkDeferredReferral() reads "ref:handle" from the pasteboard.
+            try {
+                navigator.clipboard.writeText('ref:' + handle).catch(function() {});
+            } catch(e) {}
+
+            // Track the click on the backend (fire-and-forget).
+            // Update the API_BASE below once the backend is deployed.
+            var API_BASE = 'https://protocol-ai-backend-136ff028e7cc.herokuapp.com';
+            try {
+                fetch(API_BASE + '/referral/click/' + encodeURIComponent(handle), { method: 'POST' });
+            } catch(e) {}
+
+            // Try to open the app directly via custom URL scheme.
+            // If the app is installed, this fires immediately and the user leaves the page.
+            // If not installed, nothing visible happens and the user sees the download button.
+            window.location.href = 'protocol://refer?code=' + handle;
+        })();
+    </script>
+</body>
+</html>
