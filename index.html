@@ -1,1176 +1,1215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Protocol — Strength In Structure</title>
-    <meta name="description" content="A discipline-focused iOS fitness app. AI meal scanning, workout tracking, and personalized coaching built around structure and consistency.">
-    <meta property="og:image" content="og-image.png">
-    <meta property="og:title" content="Protocol — Strength In Structure">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    <style>
-        :root {
-            --bg: #0a0a0a;
-            --accent: #3ECFD4;
-            --accent-light: #5ED9DD;
-            --accent-glow: rgba(62, 207, 212, 0.5);
-            --accent-dim: rgba(62, 207, 212, 0.15);
-            --amber: #D4A03E;
-            --amber-light: #E8B84A;
-            --amber-glow: rgba(212, 160, 62, 0.5);
-            --terminal-green: #00FF41;
-            --terminal-glow: rgba(0, 255, 65, 0.5);
-            --text: #fff;
-            --text-muted: rgba(255, 255, 255, 0.6);
-            --text-subtle: rgba(255, 255, 255, 0.4);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-        
-        /* Loader */
-        .loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        .loader.hidden { opacity: 0; visibility: hidden; }
-        .loader-ring {
-            width: 60px; height: 60px;
-            border: 2px solid var(--accent-dim);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        /* Nav */
-        nav {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            padding: 1.25rem 1.5rem;
-            display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(to bottom, rgba(10, 10, 10, 0.98), rgba(10, 10, 10, 0));
-            backdrop-filter: blur(20px);
-            transform: translateY(-100%);
-        }
-        .logo { height: 48px; width: auto; opacity: 0; }
-        .nav-right { display: flex; align-items: center; gap: 1rem; }
-        .nav-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.875rem;
-            letter-spacing: 0.5px;
-            padding: 0.5rem 0.75rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            opacity: 0;
-        }
-        .nav-link:hover { background: var(--accent-dim); color: var(--accent-light); }
-        .nav-cta {
-            display: flex; align-items: center; gap: 0.5rem;
-            background: var(--amber); color: var(--bg);
-            padding: 0.625rem 1.25rem; border-radius: 50px;
-            text-decoration: none; font-weight: 600; font-size: 0.875rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px var(--amber-glow);
-            opacity: 0;
-        }
-        .nav-cta:hover { transform: scale(1.05); box-shadow: 0 0 40px var(--amber-glow); }
-        .nav-cta svg { width: 16px; height: 16px; }
-        
-        /* Hero */
-        .hero {
-            min-height: 100vh;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            padding: 6rem 1.5rem 4rem;
-            position: relative; overflow: hidden;
-        }
-        .hero-animation {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%; height: 100%;
-            max-width: 500px; max-height: 500px;
-            pointer-events: none;
-        }
-        .animation-container { position: relative; width: 100%; height: 100%; }
-        .hero-svg {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%; height: 100%;
-        }
-        .dot-grid {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            display: grid; grid-template-columns: repeat(9, 1fr);
-            gap: 10px; opacity: 0.6;
-        }
-        .grid-dot {
-            width: 3px; height: 3px;
-            background: var(--accent); border-radius: 50%;
-            opacity: 0; transform: scale(0);
-        }
-        .particles {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
-            overflow: hidden; pointer-events: none;
-        }
-        .particle {
-            position: absolute;
-            width: 3px; height: 3px;
-            background: var(--accent); border-radius: 50%;
-            opacity: 0;
-        }
-        .hero-content {
-            position: relative; z-index: 10;
-            text-align: center; max-width: 600px;
-        }
-        .hero-badge {
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            background: var(--accent-dim);
-            border: 1px solid rgba(62, 207, 212, 0.3);
-            padding: 0.5rem 1rem; border-radius: 50px;
-            font-size: 0.75rem; font-weight: 600;
-            color: var(--accent); margin-bottom: 1.5rem;
-            opacity: 0; transform: translateY(20px);
-            text-transform: uppercase; letter-spacing: 0.1em;
-        }
-        .hero-badge::before {
-            content: ''; width: 6px; height: 6px;
-            background: var(--terminal-green); border-radius: 50%;
-            box-shadow: 0 0 8px var(--terminal-glow);
-            animation: pulse-dot 2s ease-in-out infinite;
-        }
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--terminal-glow); }
-            50% { opacity: 0.6; transform: scale(0.8); box-shadow: 0 0 4px var(--terminal-glow); }
-        }
-        .hero-title {
-            font-size: clamp(2.5rem, 10vw, 5rem);
-            font-weight: 800; line-height: 1.05;
-            margin-bottom: 1.5rem; letter-spacing: -0.03em;
-            opacity: 0;
-        }
-        .hero-title .line { display: block; overflow: hidden; }
-        .hero-title .word { display: inline-block; transform: translateY(100%); }
-        .hero-title .accent { color: var(--amber); }
-        .hero-subtitle {
-            font-size: clamp(1rem, 3vw, 1.25rem);
-            color: var(--text-muted);
-            max-width: 500px; margin: 0 auto 2.5rem;
-            line-height: 1.7; opacity: 0; transform: translateY(20px);
-        }
-        .hero-cta {
-            display: inline-flex; align-items: center; gap: 0.75rem;
-            background: var(--amber); color: var(--bg);
-            padding: 1rem 2rem; border-radius: 50px;
-            text-decoration: none; font-weight: 700; font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 40px var(--amber-glow);
-            opacity: 0; transform: translateY(20px);
-        }
-        .hero-cta:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 60px var(--amber-glow);
-        }
-        .hero-cta svg { width: 20px; height: 20px; }
-        .scroll-indicator {
-            position: absolute; bottom: 2rem; left: 50%;
-            transform: translateX(-50%);
-            display: flex; flex-direction: column;
-            align-items: center; gap: 0.5rem; opacity: 0;
-        }
-        .scroll-indicator span {
-            font-size: 0.7rem; color: var(--text-subtle);
-            text-transform: uppercase; letter-spacing: 0.15em;
-        }
-        .scroll-line {
-            width: 1px; height: 30px;
-            background: linear-gradient(to bottom, var(--accent), transparent);
-            animation: scroll-pulse 2s ease-in-out infinite;
-        }
-        @keyframes scroll-pulse {
-            0%, 100% { transform: scaleY(1); opacity: 1; }
-            50% { transform: scaleY(0.5); opacity: 0.5; }
-        }
-        
-        /* Features */
-        .features { position: relative; padding: 4rem 0; }
-        .features-header {
-            text-align: center; padding: 0 1.5rem 3rem;
-            opacity: 0; transform: translateY(30px);
-        }
-        .features-header h2 {
-            font-size: clamp(1.75rem, 6vw, 3rem);
-            font-weight: 800; margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-        }
-        .features-header h2 span { color: var(--accent); }
-        .features-header p { color: var(--text-muted); max-width: 400px; margin: 0 auto; font-size: 0.95rem; }
-        
-        /* Desktop Features */
-        .features-desktop { display: none; height: 400vh; }
-        .features-sticky {
-            position: sticky; top: 0; height: 100vh;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
-        }
-        .features-inner {
-            display: grid; grid-template-columns: 1fr auto 1fr;
-            gap: 4rem; max-width: 1400px; width: 100%;
-            padding: 0 4rem; align-items: center;
-        }
-        .feature-labels-left, .feature-labels-right {
-            display: flex; flex-direction: column; gap: 2.5rem;
-        }
-        .feature-label {
-            opacity: 0.2;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative; padding: 1.5rem 0; cursor: default;
-        }
-        .feature-label.active { opacity: 1; }
-        .feature-labels-left .feature-label { text-align: right; padding-right: 2.5rem; }
-        .feature-labels-right .feature-label { text-align: left; padding-left: 2.5rem; }
-        .feature-label h3 {
-            font-size: 1.25rem; font-weight: 700;
-            margin-bottom: 0.5rem; color: var(--text);
-            transition: color 0.4s ease;
-        }
-        .feature-label.active h3 { color: var(--accent); }
-        .feature-label p {
-            font-size: 0.9rem; color: var(--text-subtle);
-            max-width: 260px; line-height: 1.6;
-            transition: color 0.4s ease;
-        }
-        .feature-label.active p { color: var(--text-muted); }
-        .feature-labels-left .feature-label p { margin-left: auto; }
-        .feature-label::after {
-            content: ''; position: absolute; top: 50%;
-            width: 50px; height: 2px;
-            background: linear-gradient(to right, transparent, var(--accent));
-            opacity: 0; transition: all 0.4s ease; transform: scaleX(0);
-        }
-        .feature-labels-left .feature-label::after {
-            right: 0; transform-origin: right;
-            background: linear-gradient(to left, transparent, var(--accent));
-        }
-        .feature-labels-right .feature-label::after { left: 0; transform-origin: left; }
-        .feature-label.active::after { opacity: 1; transform: scaleX(1); }
-        .feature-label::before {
-            content: ''; position: absolute; top: 50%;
-            transform: translateY(-50%);
-            width: 10px; height: 10px;
-            background: var(--accent); border-radius: 50%;
-            opacity: 0; transition: all 0.4s ease;
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-        .feature-labels-left .feature-label::before { right: -5px; }
-        .feature-labels-right .feature-label::before { left: -5px; }
-        .feature-label.active::before { opacity: 1; animation: dot-anim 2s ease-in-out infinite; }
-        @keyframes dot-anim {
-            0%, 100% { transform: translateY(-50%) scale(1); }
-            50% { transform: translateY(-50%) scale(1.2); }
-        }
-        
-        .phone-container { position: relative; }
-        .phone-glow {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 350px; height: 350px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            opacity: 0.4; filter: blur(40px);
-            animation: glow-pulse 4s ease-in-out infinite;
-        }
-        @keyframes glow-pulse {
-            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); }
-        }
-        .phone-mockup {
-            position: relative; width: 280px; height: 580px;
-            background: linear-gradient(145deg, #1c1c1c, #0d0d0d);
-            border-radius: 45px; padding: 12px;
-            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.9),
-                0 0 0 1px rgba(255, 255, 255, 0.1);
-        }
-        .phone-screen {
-            width: 100%; height: 100%;
-            background: var(--bg); border-radius: 35px;
-            overflow: hidden; position: relative;
-        }
-        .phone-notch {
-            position: absolute; top: 8px; left: 50%;
-            transform: translateX(-50%);
-            width: 90px; height: 26px;
-            background: #000; border-radius: 15px; z-index: 10;
-        }
-        .feature-screenshot {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%; object-fit: cover;
-            opacity: 0; transition: opacity 0.6s ease;
-        }
-        .feature-screenshot.active { opacity: 1; }
-        
-        /* ============================================
-           MOBILE FEATURES - HEAVILY ANIMATED
-           ============================================ */
-        .features-mobile { 
-            display: block; 
-            padding: 0 1.5rem;
-            position: relative;
-        }
-        
-        /* Mobile floating particles background */
-        .mobile-particles {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .mobile-particle {
-            position: absolute;
-            width: 4px; height: 4px;
-            background: var(--accent);
-            border-radius: 50%;
-            opacity: 0;
-        }
-        
-        .feature-cards { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 2rem;
-            position: relative;
-        }
-        
-        /* Progress line connecting cards */
-        .feature-progress-line {
-            position: absolute;
-            left: 20px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: rgba(212, 160, 62, 0.1);
-        }
-        .feature-progress-fill {
-            width: 100%;
-            height: 0%;
-            background: linear-gradient(to bottom, var(--accent), var(--accent-light));
-            transition: height 0.3s ease;
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-        
-        .feature-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px; 
-            overflow: hidden;
-            position: relative;
-            opacity: 0;
-            transform: translateY(80px) scale(0.9);
-            margin-left: 30px;
-        }
-        
-        /* Card connector dot */
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            left: -38px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 14px; height: 14px;
-            background: var(--bg);
-            border: 2px solid rgba(212, 160, 62, 0.3);
-            border-radius: 50%;
-            z-index: 2;
-            transition: all 0.4s ease;
-        }
-        .feature-card.visible::before {
-            background: var(--accent);
-            border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-        
-        /* Glowing top border */
-        .feature-card-border {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            transform: scaleX(0);
-            transition: transform 0.6s ease;
-        }
-        .feature-card.visible .feature-card-border {
-            transform: scaleX(1);
-        }
-        
-        /* Card glow effect */
-        .feature-card-glow {
-            position: absolute;
-            top: -100px; left: 50%;
-            transform: translateX(-50%);
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            opacity: 0; filter: blur(40px);
-            transition: opacity 0.8s ease;
-            pointer-events: none;
-        }
-        .feature-card.visible .feature-card-glow { opacity: 0.4; }
-        
-        /* Card number */
-        .feature-card-number {
-            position: absolute;
-            top: 1rem; right: 1rem;
-            font-size: 5rem; font-weight: 800;
-            color: var(--amber);
-            opacity: 0;
-            line-height: 1;
-            transform: translateX(30px);
-            transition: all 0.6s ease 0.3s;
-            z-index: 1;
-        }
-        .feature-card.visible .feature-card-number {
-            opacity: 0.12;
-            transform: translateX(0);
-        }
-        
-        .feature-card-image {
-            width: 100%; 
-            aspect-ratio: 9/11;
-            overflow: hidden; 
-            position: relative;
-        }
-        .feature-card-image::after {
-            content: ''; position: absolute;
-            bottom: 0; left: 0; right: 0; height: 150px;
-            background: linear-gradient(to top, var(--bg), transparent);
-            pointer-events: none;
-        }
-        .feature-card-image img { 
-            width: 100%; height: 100%; 
-            object-fit: cover; object-position: top;
-            transform: scale(1.15);
-            transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .feature-card.visible .feature-card-image img { 
-            transform: scale(1); 
-        }
-        
-        .feature-card-content { 
-            padding: 1.5rem; 
-            padding-right: 4.5rem;
-            position: relative;
-        }
-        .feature-card-content h3 {
-            font-size: 1.35rem; font-weight: 700;
-            color: var(--text); margin-bottom: 0.75rem;
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.5s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-        .feature-card-content h3::before {
-            content: '';
-            width: 8px; height: 8px;
-            background: var(--terminal-green);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--terminal-glow);
-            flex-shrink: 0;
-            opacity: 0;
-            transform: scale(0);
-            transition: all 0.4s ease;
-        }
-        .feature-card.visible .feature-card-content h3 {
-            transform: translateY(0);
-            opacity: 1;
-            color: var(--accent);
-            transition-delay: 0.2s;
-        }
-        .feature-card.visible .feature-card-content h3::before {
-            opacity: 1;
-            transform: scale(1);
-            animation: pulse-dot 2s ease-in-out infinite;
-            transition-delay: 0.4s;
-        }
-        .feature-card-content p { 
-            font-size: 0.95rem; 
-            color: var(--text-muted); 
-            line-height: 1.7;
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.5s ease;
-        }
-        .feature-card.visible .feature-card-content p {
-            transform: translateY(0);
-            opacity: 1;
-            transition-delay: 0.3s;
-        }
-        
-        /* Feature icon */
-        .feature-card-icon {
-            position: absolute;
-            bottom: 1.5rem; right: 1.5rem;
-            width: 44px; height: 44px;
-            background: var(--accent-dim);
-            border: 1px solid rgba(212, 160, 62, 0.3);
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            transform: scale(0) rotate(-45deg);
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .feature-card.visible .feature-card-icon {
-            transform: scale(1) rotate(0deg);
-            opacity: 1;
-            transition-delay: 0.4s;
-        }
-        .feature-card-icon svg {
-            width: 22px; height: 22px;
-            color: var(--accent);
-        }
-        
-        /* Stats */
-        .stats {
-            padding: 5rem 1.5rem; position: relative; overflow: hidden;
-        }
-        .stats::before {
-            content: ''; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px; height: 300px;
-            background: radial-gradient(ellipse, var(--accent-dim) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        .stats-header {
-            text-align: center; margin-bottom: 2.5rem;
-            opacity: 0; transform: translateY(20px);
-        }
-        .stats-header h2 {
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            font-weight: 700;
-        }
-        .stats-header h2 span { color: var(--accent); }
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 1rem; max-width: 500px; margin: 0 auto;
-            position: relative;
-        }
-        .stat-item {
-            text-align: center; padding: 1.75rem 1rem;
-            background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 20px;
-            opacity: 0; transform: translateY(40px) scale(0.85);
-            position: relative; overflow: hidden;
-        }
-        .stat-item::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(212, 160, 62, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-        .stat-item.visible::before { left: 100%; }
-        .stat-item:hover {
-            border-color: rgba(212, 160, 62, 0.3);
-            transform: translateY(-5px) scale(1.02);
-        }
-        .stat-value {
-            font-size: clamp(2.25rem, 8vw, 3rem);
-            font-weight: 800; color: var(--amber);
-            margin-bottom: 0.25rem; line-height: 1;
-        }
-        .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
-        
-        /* CTA */
-        .cta {
-            padding: 5rem 1.5rem 6rem; text-align: center; position: relative;
-        }
-        .cta-glow {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 60%);
-            opacity: 0.15; pointer-events: none; filter: blur(60px);
-        }
-        .cta-content { position: relative; opacity: 0; transform: translateY(30px); }
-        .cta h2 {
-            font-size: clamp(1.75rem, 6vw, 3rem);
-            font-weight: 800; margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-        }
-        .cta p {
-            font-size: 1rem; color: var(--text-muted);
-            margin-bottom: 2rem; max-width: 400px;
-            margin-left: auto; margin-right: auto;
-        }
-        .cta-buttons {
-            display: flex; gap: 1rem;
-            justify-content: center; flex-wrap: wrap;
-        }
-        .btn-primary {
-            display: inline-flex; align-items: center; gap: 0.75rem;
-            background: var(--amber); color: var(--bg);
-            padding: 1rem 2rem; border-radius: 50px;
-            text-decoration: none; font-weight: 700; font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 40px var(--amber-glow);
-            opacity: 0; transform: translateY(20px);
-        }
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 60px var(--amber-glow);
-        }
-        .btn-primary svg { width: 20px; height: 20px; }
-        .btn-secondary {
-            display: inline-flex; align-items: center; gap: 0.75rem;
-            background: transparent; color: var(--text);
-            padding: 1rem 2rem; border-radius: 50px;
-            text-decoration: none; font-weight: 600; font-size: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-            opacity: 0; transform: translateY(20px);
-        }
-        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-secondary svg { width: 18px; height: 18px; }
-        
-        /* Footer */
-        footer {
-            padding: 2rem 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .footer-content {
-            display: flex; flex-direction: column;
-            align-items: center; gap: 1.5rem;
-            max-width: 1400px; margin: 0 auto;
-        }
-        .footer-links { display: flex; gap: 2rem; }
-        .footer-links a {
-            color: var(--text-muted); text-decoration: none;
-            font-size: 0.875rem; transition: color 0.3s ease;
-        }
-        .footer-links a:hover { color: var(--accent); }
-        .footer-copyright { color: var(--text-subtle); font-size: 0.8rem; }
-        
-        /* Progress Bar */
-        .progress-bar {
-            position: fixed; bottom: 0; left: 0;
-            width: 100%; height: 3px;
-            background: rgba(255, 255, 255, 0.05); z-index: 1000;
-        }
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(to right, var(--accent), var(--accent-light));
-            width: 0%;
-            box-shadow: 0 0 15px var(--accent-glow);
-            transition: width 0.1s ease;
-        }
-        
-        /* Responsive */
-        @media (min-width: 900px) {
-            nav { padding: 1.5rem 4rem; }
-            .logo { height: 56px; }
-            .hero { padding: 8rem 4rem 4rem; }
-            .hero-animation { max-width: 700px; max-height: 700px; }
-            .features-desktop { display: block; }
-            .features-mobile { display: none; }
-            .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 800px; }
-            .stat-item { padding: 2.5rem 1.5rem; }
-            .footer-content { flex-direction: row; justify-content: space-between; }
-        }
-        @media (max-width: 500px) {
-            .nav-right { gap: 0.5rem; }
-            .nav-link { font-size: 0.75rem; padding: 0.4rem 0.5rem; }
-            .nav-cta { padding: 0.5rem 0.875rem; font-size: 0.8rem; }
-        }
-        @media (max-width: 400px) {
-            .hero-title { font-size: 2.25rem; }
-            .hero-cta { padding: 0.875rem 1.5rem; font-size: 0.9rem; }
-            .btn-primary, .btn-secondary {
-                padding: 0.875rem 1.5rem; font-size: 0.9rem;
-                width: 100%; justify-content: center;
-            }
-            .feature-card { margin-left: 25px; }
-            .feature-card::before { left: -32px; width: 12px; height: 12px; }
-            .feature-progress-line { left: 15px; }
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protocol — Strength In Structure</title>
+<meta name="description" content="A discipline-focused iOS fitness app. AI meal scanning, workout tracking, and personalized coaching built around structure and consistency.">
+<link rel="canonical" href="https://protocolapp.ai/">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="apple-itunes-app" content="app-id=6756283460">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://protocolapp.ai/">
+<meta property="og:title" content="Protocol — Strength In Structure">
+<meta property="og:description" content="A discipline-focused iOS fitness app. AI meal scanning, workout tracking, and personalized coaching built around structure and consistency.">
+<meta property="og:image" content="https://protocolapp.ai/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Protocol — Strength In Structure">
+<meta name="twitter:description" content="A discipline-focused iOS fitness app. AI meal scanning, workout tracking, and personalized coaching built around structure and consistency.">
+<meta name="twitter:image" content="https://protocolapp.ai/og-image.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/media/favicon-32.png">
+<link rel="apple-touch-icon" href="/media/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#0A0A0A}
+a{color:#3ECFD4}
+a:hover{color:#8BE6E9}
+.navlink:hover{color:#FFFFFF!important}
+.btn-gold:hover{background:#E2B257!important}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.45)!important}
+.fcard{transition:border-color .3s}
+.fcard:hover{border-color:rgba(62,207,212,0.35)!important}
+@media (max-width: 640px){.hide-sm{display:none!important}}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.rise{animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes livedot{0%{box-shadow:0 0 0 0 rgba(74,222,128,.55)}70%,100%{box-shadow:0 0 0 9px rgba(74,222,128,0)}}
+.live{animation:livedot 2s ease-out infinite}
+@keyframes pillscan{0%{left:-70px}55%,100%{left:105%}}
+.pscan{animation:pillscan 4.5s ease-in-out infinite}
+@keyframes cue{0%{transform:translateY(-18px)}100%{transform:translateY(46px)}}
+.cue{animation:cue 1.8s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes hp{0%{transform:translateX(0);opacity:0}8%{opacity:1}34%{transform:translateX(-72px);opacity:1}38%,100%{transform:translateX(-72px);opacity:0}}
+.hp{animation:hp 3.2s cubic-bezier(.45,0,.75,.4) infinite}
+@keyframes srcon{0%,12%{border-color:#3ECFD4;color:#3ECFD4}22%,100%{border-color:rgba(255,255,255,0.14);color:rgba(255,255,255,0.82)}}
+.src{animation:srcon 3.2s linear infinite}
+@keyframes cring{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.45);opacity:0}}
+.cring{animation:cring 1.6s ease-out infinite}
+@keyframes hcu{0%,3%{opacity:0;transform:translateY(10px)}8%,92%{opacity:1;transform:none}97%,100%{opacity:0;transform:none}}
+.hc-user{animation:hcu 9s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes hct{0%,10%{opacity:0}12%,21%{opacity:1}23%,100%{opacity:0}}
+.hc-typing{animation:hct 9s linear infinite}
+@keyframes hcb{0%,22%{opacity:0;transform:translateY(10px)}26%,92%{opacity:1;transform:none}97%,100%{opacity:0;transform:none}}
+.hc-bot{animation:hcb 9s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes hcx{0%,24%{clip-path:inset(0 0 100% 0)}50%,100%{clip-path:inset(0 0 0 0)}}
+.hc-text{animation:hcx 9s linear infinite}
+@keyframes hch{0%,30%{border-color:rgba(255,255,255,0.14);color:rgba(255,255,255,0.6);background:transparent}34%,90%{border-color:rgba(62,207,212,0.6);color:#3ECFD4;background:rgba(62,207,212,0.08)}96%,100%{border-color:rgba(255,255,255,0.14);color:rgba(255,255,255,0.6);background:transparent}}
+.hc-chip{animation:hch 9s ease-out infinite}
+.cyc-m{transform-origin:140px 140px;animation:spin 10s linear infinite}
+@keyframes phm{0%,15%{opacity:1}19%,97%{opacity:0}100%{opacity:1}}
+@keyframes phf{0%,16%{opacity:0}19%,45%{opacity:1}48%,100%{opacity:0}}
+@keyframes pho{0%,45%{opacity:0}48%,56%{opacity:1}59%,100%{opacity:0}}
+@keyframes phl{0%,56%{opacity:0}59%,97%{opacity:1}100%{opacity:0}}
+.ph-m{animation:phm 10s linear infinite}
+.ph-f{animation:phf 10s linear infinite}
+.ph-o{animation:pho 10s linear infinite}
+.ph-l{animation:phl 10s linear infinite}
+@keyframes wcur{from{transform:translateX(0)}to{transform:translateX(500px)}}
+.wcur{animation:wcur 10s linear infinite}
+@keyframes wband{0%,55%{opacity:.3}59%,96%{opacity:1}100%{opacity:.3}}
+.wband{animation:wband 10s linear infinite}
+@keyframes wnote{0%,62%{opacity:0;transform:translateY(6px)}66%,94%{opacity:1;transform:none}98%,100%{opacity:0;transform:none}}
+.wnote{animation:wnote 10s ease-out infinite}
+@keyframes btog{0%,64%{transform:translateX(0)}68%,94%{transform:translateX(12px)}98%,100%{transform:translateX(0)}}
+.b-tog{animation:btog 7s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes btrk{0%,64%{background:rgba(255,255,255,0.22)}68%,94%{background:#3ECFD4}98%,100%{background:rgba(255,255,255,0.22)}}
+.b-trk{animation:btrk 7s linear infinite}
+@keyframes bva{0%,66%{opacity:1}70%,94%{opacity:0}98%,100%{opacity:1}}
+@keyframes bvb{0%,66%{opacity:0}70%,94%{opacity:1}98%,100%{opacity:0}}
+.b-va{animation:bva 7s linear infinite}
+.b-vb{animation:bvb 7s linear infinite}
+.mstep,.bstep{transition:border-color .35s,background-color .35s}
+.mstep.on,.bstep.on{border-color:rgba(62,207,212,0.55)!important;background:rgba(62,207,212,0.07)!important}
+.mstep.on .mnum{color:#3ECFD4!important}
+.mstep.on .mttl{color:#FFFFFF!important}
+.bstep.on .bval{color:#3ECFD4!important}
+@keyframes mprog{from{width:0%}to{width:100%}}
+.mprog{animation:mprog 5s linear both}
+@keyframes rin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rin{animation:rin .45s cubic-bezier(.2,.8,.2,1) both}
+.src{transition:background-color .3s,box-shadow .3s}
+.src.lit{border-color:#3ECFD4!important;color:#0A0A0A!important;background:#3ECFD4!important;box-shadow:0 0 26px rgba(62,207,212,0.55)}
+@keyframes mvf{0%{transform:scale(1.2);opacity:0}12%,90%{transform:scale(1);opacity:1}98%,100%{transform:scale(1);opacity:0}}
+.m-vf{animation:mvf 6s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes mflash{0%,29%{opacity:0}31%{opacity:.45}38%,100%{opacity:0}}
+.m-flash{animation:mflash 6s linear infinite}
+@keyframes mscan{0%,31%{transform:translateY(0);opacity:0}33%{transform:translateY(0);opacity:1}47%{transform:translateY(146px);opacity:1}49%,100%{transform:translateY(146px);opacity:0}}
+.m-scan{animation:mscan 6s ease-in-out infinite}
+@keyframes mdet{0%,48%{opacity:0;transform:scale(1.12)}53%,90%{opacity:1;transform:scale(1)}97%,100%{opacity:0;transform:scale(1)}}
+.m-det{animation:mdet 6s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes mcard{0%,54%{opacity:0;transform:translateY(14px)}60%,90%{opacity:1;transform:none}97%,100%{opacity:0;transform:none}}
+.m-card{animation:mcard 6s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes mp1{0%,28%{color:#3ECFD4}31%,100%{color:rgba(255,255,255,0.5)}}
+@keyframes mp2{0%,29%{color:rgba(255,255,255,0.5)}31%,50%{color:#3ECFD4}53%,100%{color:rgba(255,255,255,0.5)}}
+@keyframes mp3{0%,53%{color:rgba(255,255,255,0.5)}56%,94%{color:#3ECFD4}97%,100%{color:rgba(255,255,255,0.5)}}
+.m-p1{animation:mp1 6s linear infinite}
+.m-p2{animation:mp2 6s linear infinite}
+.m-p3{animation:mp3 6s linear infinite}
+@keyframes wrow{0%{opacity:0;transform:translateX(-12px)}7%,90%{opacity:1;transform:none}97%,100%{opacity:0;transform:none}}
+.w-row{animation:wrow 6s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes wchk{0%,9%{background:transparent;border-color:rgba(255,255,255,0.28);color:transparent}13%,90%{background:#3ECFD4;border-color:#3ECFD4;color:#0A0A0A}97%,100%{background:transparent;border-color:rgba(255,255,255,0.28);color:transparent}}
+.w-chk{animation:wchk 6s ease-out infinite}
+@keyframes wpr{0%,35%{opacity:0;transform:scale(.6)}39%{opacity:1;transform:scale(1.15)}42%,90%{opacity:1;transform:scale(1)}97%,100%{opacity:0;transform:scale(1)}}
+.w-pr{animation:wpr 6s ease-out infinite}
+@keyframes wbar{0%,44%{transform:scaleY(.62)}56%,92%{transform:scaleY(1)}100%{transform:scaleY(.62)}}
+.w-bar{transform-origin:bottom;animation:wbar 6s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes cuser{0%,6%{opacity:0;transform:translateY(10px)}12%,90%{opacity:1;transform:none}97%,100%{opacity:0;transform:none}}
+.c-user{animation:cuser 7s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes ctyping{0%,16%{opacity:0}19%,34%{opacity:1}36%,100%{opacity:0}}
+.c-typing{animation:ctyping 7s linear infinite}
+@keyframes cdot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+.c-dot{animation:cdot 1s ease-in-out infinite}
+@keyframes cbot{0%,35%{opacity:0;transform:translateY(10px)}40%,90%{opacity:1;transform:none}97%,100%{opacity:0;transform:none}}
+.c-bot{animation:cbot 7s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes ctext{0%,38%{clip-path:inset(0 0 100% 0)}62%,100%{clip-path:inset(0 0 0 0)}}
+.c-text{animation:ctext 7s linear infinite}
+@keyframes cctx{0%,42%{border-color:rgba(255,255,255,0.16);color:rgba(255,255,255,0.72);background:transparent}48%,88%{border-color:#3ECFD4;color:#3ECFD4;background:rgba(62,207,212,0.1)}95%,100%{border-color:rgba(255,255,255,0.16);color:rgba(255,255,255,0.72);background:transparent}}
+.c-ctx{animation:cctx 7s ease-out infinite}
+@keyframes pdot{0%{opacity:0}5%,90%{opacity:1}97%,100%{opacity:0}}
+.p-dot{animation:pdot 7s ease-out infinite}
+@keyframes pline{0%,28%{stroke-dashoffset:100;opacity:1}58%,90%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
+.p-line{animation:pline 7s ease-in-out infinite}
+@keyframes pbar{0%,4%{transform:scaleY(0)}14%,90%{transform:scaleY(1)}97%,100%{transform:scaleY(0)}}
+.p-bar{transform-box:fill-box;transform-origin:bottom;animation:pbar 7s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes pins{0%,62%{opacity:0;transform:translateY(10px)}68%,90%{opacity:1;transform:none}97%,100%{opacity:0;transform:none}}
+.p-ins{animation:pins 7s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes kbh{0%,22%{height:114px;background:rgba(255,255,255,0.2)}40%,82%{height:130px;background:#D4A03E}100%{height:114px;background:rgba(255,255,255,0.2)}}
+@keyframes kbl{0%,22%{height:114px;background:rgba(255,255,255,0.2)}40%,82%{height:94px;background:#3ECFD4}100%{height:114px;background:rgba(255,255,255,0.2)}}
+@keyframes ksh{0%,22%{flex-grow:22;background:rgba(255,255,255,0.2)}40%,82%{flex-grow:25;background:#D4A03E}100%{flex-grow:22;background:rgba(255,255,255,0.2)}}
+@keyframes ksl{0%,22%{flex-grow:22;background:rgba(255,255,255,0.2)}40%,82%{flex-grow:18;background:#3ECFD4}100%{flex-grow:22;background:rgba(255,255,255,0.2)}}
+.kbh{animation:kbh 6s cubic-bezier(.65,0,.35,1) infinite}
+.kbl{animation:kbl 6s cubic-bezier(.65,0,.35,1) infinite}
+.ksh{animation:ksh 6s cubic-bezier(.65,0,.35,1) infinite}
+.ksl{animation:ksl 6s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes kflat{0%,24%{opacity:1}30%,80%{opacity:0}88%,100%{opacity:1}}
+@keyframes kcyc{0%,24%{opacity:0}30%,80%{opacity:1}88%,100%{opacity:0}}
+.k-flat{animation:kflat 6s linear infinite}
+.k-cyc{animation:kcyc 6s linear infinite}
+@keyframes bclip{0%{transform:scaleY(0)}42%,100%{transform:scaleY(1)}}
+.b-clip{transform-box:fill-box;transform-origin:top;animation:bclip 7s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes bfade{0%,88%{opacity:1}97%,100%{opacity:0}}
+.b-fade{animation:bfade 7s linear infinite}
+@keyframes bline{0%{transform:translateY(0);opacity:1}42%{transform:translateY(212px);opacity:1}46%,100%{transform:translateY(212px);opacity:0}}
+.b-line{animation:bline 7s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes br{0%,44%{opacity:0;transform:translateX(10px)}50%,90%{opacity:1;transform:none}97%,100%{opacity:0;transform:none}}
+.b-r{animation:br 7s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes ttile{0%{opacity:.15;transform:scale(.7)}10%,78%{opacity:1;transform:scale(1)}90%,100%{opacity:.15;transform:scale(.7)}}
+.t-tile{animation:ttile 4s ease-out infinite}
+@keyframes lkring{0%{stroke-dashoffset:100;opacity:1}45%,86%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+.lk-ring{animation:lkring 5s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes lksh{0%,44%{transform:translateY(-5px)}52%,100%{transform:translateY(0)}}
+.lk-sh{animation:lksh 5s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes ad{0%,22%{opacity:1;transform:scale(1)}36%,84%{opacity:0;transform:scale(.4)}100%{opacity:1;transform:scale(1)}}
+.ad{animation:ad 5s ease-in-out infinite}
+@keyframes adx{0%,6%{transform:rotate(-20deg) scaleX(0)}16%,84%{transform:rotate(-20deg) scaleX(1)}86%,100%{transform:rotate(-20deg) scaleX(0)}}
+.ad-x{animation:adx 5s ease-out infinite}
+.dial{transform-origin:36px 36px;animation:spin 9s linear infinite}
+@keyframes cscan{0%{top:0%;opacity:0}10%,90%{opacity:1}100%{top:100%;opacity:0}}
+.cscan{animation:cscan 7s linear infinite}
+@keyframes reveal{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@supports (animation-timeline: view()){.reveal{animation:reveal linear both;animation-timeline:view();animation-range:entry 0% entry 55%}}
+.r2{animation-delay:.1s}
+.r3{animation-delay:.22s}
+.r4{animation-delay:.34s}
+.hd1{animation-delay:.45s}
+.hd2{animation-delay:.9s}
+.hd3{animation-delay:1.35s}
+.hd4{animation-delay:1.8s}
+.md2{animation-delay:.12s}
+.md3{animation-delay:.24s}
+.d1{animation-delay:.15s}
+.d2{animation-delay:.85s}
+.d3{animation-delay:1.55s}
+.c-dot2{animation-delay:.15s}
+.c-dot3{animation-delay:.3s}
+.b-r2{animation-delay:.35s}
+.b-r3{animation-delay:.9s}
+.ad2{animation-delay:.2s}
+.ad3{animation-delay:.4s}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important}}
+[hidden]{display:none!important}
+</style>
 </head>
 <body>
-    <div class="loader"><div class="loader-ring"></div></div>
-    
-    <nav>
-        <img src="logo.png" alt="Protocol" class="logo">
-        <div class="nav-right">
-            <a href="https://protocol-ai-backend-136ff028e7cc.herokuapp.com/sentinel/dashboard" class="nav-link">Coach Portal</a>
-            <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="nav-cta">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                Download
-            </a>
-        </div>
-    </nav>
+<div id="top" style="background:#0A0A0A;color:#FFFFFF;font-family:Inter, system-ui, sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased">
 
-    <section class="hero">
-        <div class="hero-animation">
-            <div class="animation-container">
-                <svg class="hero-svg" viewBox="0 0 400 400">
-                    <defs>
-                        <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#D4A03E;stop-opacity:0.8" />
-                            <stop offset="50%" style="stop-color:#D4A03E;stop-opacity:0.2" />
-                            <stop offset="100%" style="stop-color:#D4A03E;stop-opacity:0.8" />
-                        </linearGradient>
-                        <filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                    </defs>
-                    <circle class="ring ring-outer" cx="200" cy="200" r="180" fill="none" stroke="url(#ringGradient)" stroke-width="1" stroke-dasharray="8 4" opacity="0"/>
-                    <circle class="ring ring-mid-1" cx="200" cy="200" r="150" fill="none" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="4 8" opacity="0"/>
-                    <circle class="ring ring-mid-2" cx="200" cy="200" r="120" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0"/>
-                    <circle class="ring ring-inner" cx="200" cy="200" r="90" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="2 10" opacity="0" filter="url(#glow)"/>
-                    <polygon class="center-triangle" points="200,160 230,220 170,220" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0" filter="url(#glow)"/>
-                    <g class="orbit-dots">
-                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
-                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
-                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
-                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
-                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
-                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
-                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
-                        <circle class="orbit-dot" cx="200" cy="20" r="4" fill="var(--accent)" opacity="0"/>
-                    </g>
-                    <path class="accent-arc arc-1" d="M 200 50 A 150 150 0 0 1 350 200" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" opacity="0" filter="url(#glow)"/>
-                    <path class="accent-arc arc-2" d="M 200 350 A 150 150 0 0 1 50 200" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" opacity="0" filter="url(#glow)"/>
-                </svg>
-                <div class="dot-grid" id="dotGrid"></div>
-                <div class="particles" id="particles"></div>
-            </div>
-        </div>
-        <div class="hero-content">
-            <div class="hero-badge"><span>Protocol — Compliance Engine</span></div>
-            <h1 class="hero-title">
-                <span class="line"><span class="word">Strength</span></span>
-                <span class="line"><span class="word">In <span class="accent">Structure</span></span></span>
-            </h1>
-            <p class="hero-subtitle">A discipline-focused fitness app. AI meal scanning, workout tracking, and personalized coaching built around structure—not gamification.</p>
-            <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="hero-cta">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                Download for iOS
-            </a>
-        </div>
-        <div class="scroll-indicator"><span>Scroll</span><div class="scroll-line"></div></div>
-    </section>
+<header id="hero" style="position:relative;overflow:hidden">
+<canvas data-hero="1" aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:100%;display:block"></canvas>
+<nav aria-label="Main" style="position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:20px 24px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+<a href="#top" aria-label="Protocol home" style="display:flex;align-items:center;min-height:44px;text-decoration:none"><img src="/media/protocol-logo.png" alt="Protocol" style="display:block;height:18px;width:auto"></a>
+<div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+<a class="navlink hide-sm" href="#engine" style="color:rgba(255,255,255,0.7);text-decoration:none;font-size:14px;font-weight:500;padding:13px 0">How it works</a>
+<a class="navlink hide-sm" href="#features" style="color:rgba(255,255,255,0.7);text-decoration:none;font-size:14px;font-weight:500;padding:13px 0">Features</a>
+<a href="https://protocol-ai-backend-136ff028e7cc.herokuapp.com/sentinel/dashboard" style="color:#3ECFD4;text-decoration:none;font-size:14px;font-weight:600;padding:13px 0">Coach Portal</a>
+<a class="btn-gold" href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 20px;border-radius:999px;background:#D4A03E;color:#0A0A0A;font-weight:700;font-size:14px;text-decoration:none;box-shadow:0 0 28px rgba(212,160,62,0.35)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4v11"></path><path d="M7 10.5l5 5 5-5"></path><path d="M5 20h14"></path></svg>Download</a>
+</div>
+</nav>
+<div style="position:relative;z-index:1;min-height:680px;display:flex;align-items:center;justify-content:center;padding:48px 24px 140px;box-sizing:border-box">
+<div style="max-width:860px;display:flex;flex-direction:column;align-items:center;gap:28px;text-align:center">
+<div class="rise" style="position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;border:1px solid rgba(62,207,212,0.35);background:rgba(10,10,10,0.6);color:#3ECFD4;font-size:12px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase">
+<span class="live" style="width:8px;height:8px;border-radius:50%;background:#4ADE80;flex:none"></span>
+<span>Protocol — Compliance Engine</span>
+<span class="pscan" aria-hidden="true" style="position:absolute;top:0;bottom:0;left:-70px;width:48px;background:rgba(62,207,212,0.18);transform:skewX(-20deg)"></span>
+</div>
+<h1 style="margin:0;font-size:clamp(52px, 8vw, 104px);line-height:0.96;font-weight:800;letter-spacing:-0.04em">
+<span class="rise r2" style="display:block">Strength</span>
+<span class="rise r3" style="display:block">In <span style="color:#D4A03E">Structure</span></span>
+</h1>
+<p class="rise r3" style="margin:0;max-width:620px;font-size:19px;line-height:1.6;color:rgba(255,255,255,0.7)">A discipline-focused fitness app. AI meal scanning, workout tracking, and personalized coaching built around structure—not gamification.</p>
+<div class="rise r4" style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+<a class="btn-gold" href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" style="display:inline-flex;align-items:center;gap:10px;min-height:54px;padding:0 28px;border-radius:999px;background:#D4A03E;color:#0A0A0A;font-weight:700;font-size:16px;text-decoration:none;box-shadow:0 0 40px rgba(212,160,62,0.4)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4v11"></path><path d="M7 10.5l5 5 5-5"></path><path d="M5 20h14"></path></svg>Download for iOS</a>
+<a class="btn-ghost" href="#engine" style="display:inline-flex;align-items:center;gap:10px;min-height:54px;padding:0 26px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);background:rgba(10,10,10,0.5);color:#FFFFFF;font-weight:600;font-size:16px;text-decoration:none">See how it works<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 5v14"></path><path d="M6 13l6 6 6-6"></path></svg></a>
+</div>
+</div>
+</div>
+<div aria-hidden="true" style="position:absolute;left:50%;bottom:28px;margin-left:-30px;width:60px;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px">
+<span style="font-size:11px;letter-spacing:0.3em;color:rgba(255,255,255,0.5)">SCROLL</span>
+<span style="position:relative;display:block;width:1px;height:46px;background:rgba(255,255,255,0.12);overflow:hidden"><span class="cue" style="position:absolute;left:0;top:0;display:block;width:1px;height:18px;background:#3ECFD4"></span></span>
+</div>
+</header>
 
-    <section class="features" id="features">
-        <div class="features-header">
-            <h2>Built for <span>Discipline</span></h2>
-            <p>Six powerful features designed to keep you consistent, accountable, and progressing.</p>
-        </div>
-        
-        <!-- Desktop Features -->
-        <div class="features-desktop">
-            <div class="features-sticky">
-                <div class="features-inner">
-                    <div class="feature-labels-left">
-                        <div class="feature-label active" data-feature="0"><h3>AI Meal Scanning</h3><p>Point. Shoot. Logged. Instant macro estimates from any meal photo.</p></div>
-                        <div class="feature-label" data-feature="1"><h3>Workout Tracking</h3><p>Log sets, track PRs, monitor volume with analytics that matter.</p></div>
-                        <div class="feature-label" data-feature="2"><h3>AI Coach</h3><p>Contextual guidance that knows your goals and constraints.</p></div>
-                    </div>
-                    <div class="phone-container">
-                        <div class="phone-glow"></div>
-                        <div class="phone-mockup">
-                            <div class="phone-screen">
-                                <div class="phone-notch"></div>
-                                <img src="feature-meal.png" alt="AI Meal Scanning" class="feature-screenshot active" data-feature="0">
-                                <img src="feature-workout.png" alt="Workout Tracking" class="feature-screenshot" data-feature="1">
-                                <img src="feature-coach.png" alt="AI Coach" class="feature-screenshot" data-feature="2">
-                                <img src="feature-progress.png" alt="Progress Analytics" class="feature-screenshot" data-feature="3">
-                                <img src="feature-calorie.png" alt="Calorie Cycling" class="feature-screenshot" data-feature="4">
-                                <img src="feature-bodyscan.png" alt="Body Scans" class="feature-screenshot" data-feature="5">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="feature-labels-right">
-                        <div class="feature-label" data-feature="3"><h3>Progress Analytics</h3><p>Weekly trends and compliance tracking. Data interpreted.</p></div>
-                        <div class="feature-label" data-feature="4"><h3>Calorie Cycling</h3><p>Intelligent high/low day distribution for your weekly budget.</p></div>
-                        <div class="feature-label" data-feature="5"><h3>Body Scans</h3><p>AI composition analysis. Protein targets from lean mass.</p></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mobile Features -->
-        <div class="features-mobile">
-            <div class="mobile-particles" id="mobileParticles"></div>
-            <div class="feature-cards">
-                <div class="feature-progress-line"><div class="feature-progress-fill" id="featureProgressFill"></div></div>
-                
-                <div class="feature-card" data-index="1">
-                    <div class="feature-card-border"></div>
-                    <div class="feature-card-glow"></div>
-                    <div class="feature-card-number">01</div>
-                    <div class="feature-card-image"><img src="feature-meal.png" alt="AI Meal Scanning"></div>
-                    <div class="feature-card-content">
-                        <h3>AI Meal Scanning</h3>
-                        <p>Point. Shoot. Logged. Instant macro estimates from any meal photo.</p>
-                    </div>
-                    <div class="feature-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                    </div>
-                </div>
-                
-                <div class="feature-card" data-index="2">
-                    <div class="feature-card-border"></div>
-                    <div class="feature-card-glow"></div>
-                    <div class="feature-card-number">02</div>
-                    <div class="feature-card-image"><img src="feature-workout.png" alt="Workout Tracking"></div>
-                    <div class="feature-card-content">
-                        <h3>Workout Tracking</h3>
-                        <p>Log sets, track PRs, monitor volume with analytics that matter.</p>
-                    </div>
-                    <div class="feature-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"></path></svg>
-                    </div>
-                </div>
-                
-                <div class="feature-card" data-index="3">
-                    <div class="feature-card-border"></div>
-                    <div class="feature-card-glow"></div>
-                    <div class="feature-card-number">03</div>
-                    <div class="feature-card-image"><img src="feature-coach.png" alt="AI Coach"></div>
-                    <div class="feature-card-content">
-                        <h3>AI Coach</h3>
-                        <p>Contextual guidance that knows your goals and constraints.</p>
-                    </div>
-                    <div class="feature-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    </div>
-                </div>
-                
-                <div class="feature-card" data-index="4">
-                    <div class="feature-card-border"></div>
-                    <div class="feature-card-glow"></div>
-                    <div class="feature-card-number">04</div>
-                    <div class="feature-card-image"><img src="feature-progress.png" alt="Progress Analytics"></div>
-                    <div class="feature-card-content">
-                        <h3>Progress Analytics</h3>
-                        <p>Weekly trends and compliance tracking. Data interpreted.</p>
-                    </div>
-                    <div class="feature-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-                    </div>
-                </div>
-                
-                <div class="feature-card" data-index="5">
-                    <div class="feature-card-border"></div>
-                    <div class="feature-card-glow"></div>
-                    <div class="feature-card-number">05</div>
-                    <div class="feature-card-image"><img src="feature-calorie.png" alt="Calorie Cycling"></div>
-                    <div class="feature-card-content">
-                        <h3>Calorie Cycling</h3>
-                        <p>Intelligent high/low day distribution for your weekly budget.</p>
-                    </div>
-                    <div class="feature-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    </div>
-                </div>
-                
-                <div class="feature-card" data-index="6">
-                    <div class="feature-card-border"></div>
-                    <div class="feature-card-glow"></div>
-                    <div class="feature-card-number">06</div>
-                    <div class="feature-card-image"><img src="feature-bodyscan.png" alt="Body Scans"></div>
-                    <div class="feature-card-content">
-                        <h3>Body Scans</h3>
-                        <p>AI composition analysis. Protein targets from lean mass.</p>
-                    </div>
-                    <div class="feature-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<section id="scan" style="max-width:1200px;margin:0 auto;padding:110px 24px 40px;box-sizing:border-box">
+<div class="reveal" style="display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;margin-bottom:56px">
+<p style="margin:0;font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#3ECFD4">AI Meal Scanning</p>
+<h2 style="margin:0;font-size:clamp(36px, 5vw, 60px);line-height:1.02;font-weight:800;letter-spacing:-0.035em">Point. Shoot. <span style="color:#D4A03E">Logged.</span></h2>
+<p style="margin:0;max-width:560px;font-size:18px;line-height:1.6;color:rgba(255,255,255,0.68)">Macros in seconds. Wrong? Fix it in a few taps, and it lands in today's totals.</p>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:48px;align-items:center;justify-content:center">
+<div style="flex:1 1 260px;min-width:0;max-width:320px;display:flex;flex-direction:column;gap:12px">
+<div class="mstep" data-k="m0" style="display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span class="mnum" style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.45);padding-top:2px">01</span>
+<div style="display:flex;flex-direction:column;gap:4px;min-width:0"><span class="mttl" style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.75)">Point</span><span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">Center the meal in the frame.</span></div>
+</div>
+<div class="mstep" data-k="m1" style="display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span class="mnum" style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.45);padding-top:2px">02</span>
+<div style="display:flex;flex-direction:column;gap:4px;min-width:0"><span class="mttl" style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.75)">Shoot</span><span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">It identifies the food, estimates portions and works out the macros.</span></div>
+</div>
+<div class="mstep" data-k="m2" style="display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span class="mnum" style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.45);padding-top:2px">03</span>
+<div style="display:flex;flex-direction:column;gap:4px;min-width:0"><span class="mttl" style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.75)">Fix it</span><span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">Missed something? Add or adjust an ingredient.</span></div>
+</div>
+<div class="mstep" data-k="m3" style="display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span class="mnum" style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.45);padding-top:2px">04</span>
+<div style="display:flex;flex-direction:column;gap:4px;min-width:0"><span class="mttl" style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.75)">Logged</span><span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">It lands in today's totals.</span></div>
+</div>
+</div>
+<div style="flex:0 0 auto;display:flex;justify-content:center">
+<div class="reveal" style="padding:10px;border-radius:50px;background:#161616;border:1px solid rgba(255,255,255,0.14);box-shadow:0 40px 90px rgba(0,0,0,0.6), 0 0 70px rgba(62,207,212,0.1)">
+<div style="position:relative;width:min(280px, 72vw);aspect-ratio:1206 / 2622;border-radius:40px;overflow:hidden;background:#0B0B0B">
+<span style="position:absolute;left:34.5%;top:1.4%;width:31%;height:4.2%;border-radius:999px;background:#000000"></span>
+<video data-meal="1" src="/media/meal-scan.mp4" poster="/media/meal-scan-poster.jpg" muted loop playsinline preload="metadata" aria-label="Screen recording: scanning a meal in Protocol, adding black beans, and logging it" style="position:absolute;left:0;top:6.48%;width:100%;height:93.52%;object-fit:cover;display:block"></video>
+</div>
+</div>
+</div>
+<div style="flex:1 1 260px;min-width:0;max-width:320px">
+<div class="reveal" style="position:relative;min-height:250px;box-sizing:border-box;padding:20px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:#101010">
+<div data-show="r0" hidden>
+<div class="rin" style="display:flex;flex-direction:column;gap:12px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.55)">Today</span>
+<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:44px;font-weight:800;letter-spacing:-0.03em;line-height:1">0</span><span style="font-family:'JetBrains Mono', monospace;font-size:14px;color:rgba(255,255,255,0.5)">/ 2,455 kcal</span></div>
+<div style="height:6px;border-radius:999px;background:rgba(255,255,255,0.08)"></div>
+<span style="font-size:14px;color:rgba(255,255,255,0.6)">No meals logged yet.</span>
+</div>
+</div>
+<div data-show="r1" hidden>
+<div class="rin" style="display:flex;flex-direction:column;gap:12px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#3ECFD4">Analyzing meal</span>
+<div style="height:6px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden"><span class="mprog" style="display:block;height:100%;width:100%;border-radius:999px;background:#3ECFD4"></span></div>
+<div style="display:flex;flex-direction:column;gap:6px;font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.65)"><span>Identifying food</span><span>Estimating portions</span><span>Deriving macros</span></div>
+</div>
+</div>
+<div data-show="r2">
+<div class="rin" style="display:flex;flex-direction:column;gap:10px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#4ADE80">Meal ready</span>
+<span style="font-size:15px;font-weight:600;line-height:1.35">Chicken Thigh with Rice and Mixed Vegetables</span>
+<div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:44px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:#3ECFD4">758</span><span style="font-family:'JetBrains Mono', monospace;font-size:14px;color:rgba(255,255,255,0.5)">kcal</span></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;font-family:'JetBrains Mono', monospace;font-size:12px"><span style="padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.05)"><span style="color:#3ECFD4">P</span> 60 g</span><span style="padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.05)"><span style="color:#6FB6FF">C</span> 62 g</span><span style="padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.05)"><span style="color:#C78BF0">F</span> 30 g</span></div>
+</div>
+</div>
+<div data-show="r3" hidden>
+<div class="rin" style="display:flex;flex-direction:column;gap:10px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#D4A03E">Fix it</span>
+<span style="font-size:15px;font-weight:600;line-height:1.35">Chicken Thigh with Rice and Mixed Vegetables</span>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:10px;border:1px dashed rgba(212,160,62,0.7);font-family:'JetBrains Mono', monospace;font-size:12px;color:#D4A03E"><span>+ Black Beans</span><span>50 g</span></div>
+<div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:44px;font-weight:800;letter-spacing:-0.03em;line-height:1">758</span><span style="font-family:'JetBrains Mono', monospace;font-size:14px;color:rgba(255,255,255,0.5)">kcal</span></div>
+</div>
+</div>
+<div data-show="r4" hidden>
+<div class="rin" style="display:flex;flex-direction:column;gap:10px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#3ECFD4">Updated</span>
+<span style="font-size:15px;font-weight:600;line-height:1.35">Chicken Thigh with Rice and Mixed Vegetables</span>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.8)"><span>+ Black Beans</span><span>50 g</span></div>
+<div style="display:flex;align-items:baseline;gap:6px"><span style="font-size:44px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:#D4A03E">826</span><span style="font-family:'JetBrains Mono', monospace;font-size:14px;color:rgba(255,255,255,0.5)">kcal</span></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;font-family:'JetBrains Mono', monospace;font-size:12px"><span style="padding:4px 8px;border-radius:8px;background:rgba(212,160,62,0.14);color:#D4A03E">P 65 g</span><span style="padding:4px 8px;border-radius:8px;background:rgba(212,160,62,0.14);color:#D4A03E">C 74 g</span><span style="padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.05)"><span style="color:#C78BF0">F</span> 30 g</span></div>
+</div>
+</div>
+<div data-show="r5" hidden>
+<div class="rin" style="display:flex;flex-direction:column;gap:12px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#4ADE80">Logged to today</span>
+<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:44px;font-weight:800;letter-spacing:-0.03em;line-height:1">826</span><span style="font-family:'JetBrains Mono', monospace;font-size:14px;color:rgba(255,255,255,0.5)">/ 2,455 kcal</span></div>
+<div style="height:6px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden"><span style="display:block;height:100%;width:33.6%;border-radius:999px;background:#3ECFD4"></span></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;font-family:'JetBrains Mono', monospace;font-size:12px"><span style="padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.05)"><span style="color:#3ECFD4">P</span> 65 g</span><span style="padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.05)"><span style="color:#6FB6FF">C</span> 74 g</span><span style="padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.05)"><span style="color:#C78BF0">F</span> 30 g</span></div>
+<span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.5)">Meal 1 · 12:50 PM</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
 
-    <section class="stats">
-        <div class="stats-header">
-            <h2>The <span>Numbers</span></h2>
-        </div>
-        <div class="stats-grid">
-            <div class="stat-item"><div class="stat-value">6</div><div class="stat-label">Core Features</div></div>
-            <div class="stat-item"><div class="stat-value">100%</div><div class="stat-label">Private</div></div>
-            <div class="stat-item"><div class="stat-value">0</div><div class="stat-label">Ads</div></div>
-            <div class="stat-item"><div class="stat-value">24/7</div><div class="stat-label">AI Coach</div></div>
-        </div>
-    </section>
+<section id="engine" style="max-width:1200px;margin:0 auto;padding:120px 24px;box-sizing:border-box">
+<div class="reveal" style="display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;margin-bottom:56px">
+<p style="margin:0;font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#3ECFD4">How it works</p>
+<h2 style="margin:0;font-size:clamp(36px, 5vw, 60px);line-height:1.02;font-weight:800;letter-spacing:-0.035em">Everything feeds <span style="color:#D4A03E">your coach.</span></h2>
+<p style="margin:0;max-width:600px;font-size:18px;line-height:1.6;color:rgba(255,255,255,0.68)">Meals, training, body scans, weight and your cycle all flow into one picture. Ask the coach anything, and it answers with all of it in view.</p>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:56px;align-items:center;justify-content:center">
+<div class="reveal" style="flex:0 1 460px;min-width:0;display:flex;justify-content:center">
+<div aria-hidden="true" style="position:relative;width:min(460px, 100%);aspect-ratio:1 / 1">
+<svg viewBox="0 0 460 460" style="position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible">
+<circle cx="230" cy="230" r="170" fill="none" stroke="rgba(255,255,255,0.05)" style="stroke-width:1"></circle>
+<circle cx="230" cy="230" r="104" fill="none" stroke="rgba(255,255,255,0.07)" style="stroke-width:1;stroke-dasharray:2 7"></circle>
+<g transform="rotate(-90 230 230)"><line x1="300" y1="230" x2="372" y2="230" stroke="rgba(255,255,255,0.14)" style="stroke-width:1;stroke-dasharray:3 4"></line><circle class="hp" cx="372" cy="230" r="3.5" fill="#3ECFD4" style="opacity:0;animation-delay:0s"></circle></g>
+<g transform="rotate(-45 230 230)"><line x1="300" y1="230" x2="372" y2="230" stroke="rgba(255,255,255,0.14)" style="stroke-width:1;stroke-dasharray:3 4"></line><circle class="hp" cx="372" cy="230" r="3.5" fill="#3ECFD4" style="opacity:0;animation-delay:.4s"></circle></g>
+<g transform="rotate(0 230 230)"><line x1="300" y1="230" x2="372" y2="230" stroke="rgba(255,255,255,0.14)" style="stroke-width:1;stroke-dasharray:3 4"></line><circle class="hp" cx="372" cy="230" r="3.5" fill="#3ECFD4" style="opacity:0;animation-delay:.8s"></circle></g>
+<g transform="rotate(45 230 230)"><line x1="300" y1="230" x2="372" y2="230" stroke="rgba(255,255,255,0.14)" style="stroke-width:1;stroke-dasharray:3 4"></line><circle class="hp" cx="372" cy="230" r="3.5" fill="#3ECFD4" style="opacity:0;animation-delay:1.2s"></circle></g>
+<g transform="rotate(90 230 230)"><line x1="300" y1="230" x2="372" y2="230" stroke="rgba(255,255,255,0.14)" style="stroke-width:1;stroke-dasharray:3 4"></line><circle class="hp" cx="372" cy="230" r="3.5" fill="#3ECFD4" style="opacity:0;animation-delay:1.6s"></circle></g>
+<g transform="rotate(135 230 230)"><line x1="300" y1="230" x2="372" y2="230" stroke="rgba(255,255,255,0.14)" style="stroke-width:1;stroke-dasharray:3 4"></line><circle class="hp" cx="372" cy="230" r="3.5" fill="#3ECFD4" style="opacity:0;animation-delay:2s"></circle></g>
+<g transform="rotate(180 230 230)"><line x1="300" y1="230" x2="372" y2="230" stroke="rgba(255,255,255,0.14)" style="stroke-width:1;stroke-dasharray:3 4"></line><circle class="hp" cx="372" cy="230" r="3.5" fill="#3ECFD4" style="opacity:0;animation-delay:2.4s"></circle></g>
+<g transform="rotate(225 230 230)"><line x1="300" y1="230" x2="372" y2="230" stroke="rgba(255,255,255,0.14)" style="stroke-width:1;stroke-dasharray:3 4"></line><circle class="hp" cx="372" cy="230" r="3.5" fill="#3ECFD4" style="opacity:0;animation-delay:2.8s"></circle></g>
+</svg>
+<span class="cring" style="position:absolute;left:35.65%;top:35.65%;width:28.7%;aspect-ratio:1 / 1;box-sizing:border-box;border-radius:50%;border:1px solid rgba(62,207,212,0.5)"></span>
+<div style="position:absolute;left:35.65%;top:35.65%;width:28.7%;aspect-ratio:1 / 1;box-sizing:border-box;border-radius:50%;background:#0D1C1D;border:1px solid rgba(62,207,212,0.55);box-shadow:0 0 40px rgba(62,207,212,0.25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3ECFD4" style="stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M4 5h16v11H9l-5 4z"></path><path d="M8 9.5h8"></path><path d="M8 12.5h5"></path></svg>
+<span style="font-size:15px;font-weight:800;letter-spacing:-0.01em">AI Coach</span>
+<img src="/media/protocol-logo.png" alt="" style="display:block;height:8px;width:auto;opacity:0.5">
+</div>
+<span class="src" style="position:absolute;left:50%;top:13.04%;transform:translate(-50%, -50%);padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#0A0A0A;color:rgba(255,255,255,0.82);font-size:12px;font-weight:600;white-space:nowrap;animation-delay:0s">Goals</span>
+<span class="src" data-k="hm" style="position:absolute;left:76.13%;top:23.87%;transform:translate(-50%, -50%);padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#0A0A0A;color:rgba(255,255,255,0.82);font-size:12px;font-weight:600;white-space:nowrap;animation-delay:.4s">Meals</span>
+<span class="src" style="position:absolute;left:86.96%;top:50%;transform:translate(-50%, -50%);padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#0A0A0A;color:rgba(255,255,255,0.82);font-size:12px;font-weight:600;white-space:nowrap;animation-delay:.8s">Training</span>
+<span class="src" style="position:absolute;left:76.13%;top:76.13%;transform:translate(-50%, -50%);padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#0A0A0A;color:rgba(255,255,255,0.82);font-size:12px;font-weight:600;white-space:nowrap;animation-delay:1.2s">Body scan</span>
+<span class="src" data-k="hw" style="position:absolute;left:50%;top:86.96%;transform:translate(-50%, -50%);padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#0A0A0A;color:rgba(255,255,255,0.82);font-size:12px;font-weight:600;white-space:nowrap;animation-delay:1.6s">Weight</span>
+<span class="src" style="position:absolute;left:23.87%;top:76.13%;transform:translate(-50%, -50%);padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#0A0A0A;color:rgba(255,255,255,0.82);font-size:12px;font-weight:600;white-space:nowrap;animation-delay:2s">Cycle</span>
+<span class="src" data-k="hc" style="position:absolute;left:13.04%;top:50%;transform:translate(-50%, -50%);padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#0A0A0A;color:rgba(255,255,255,0.82);font-size:12px;font-weight:600;white-space:nowrap;animation-delay:2.4s">Calories</span>
+<span class="src" style="position:absolute;left:23.87%;top:23.87%;transform:translate(-50%, -50%);padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#0A0A0A;color:rgba(255,255,255,0.82);font-size:12px;font-weight:600;white-space:nowrap;animation-delay:2.8s">Compliance</span>
+</div>
+</div>
+<div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:14px">
+<div class="reveal" style="padding:10px;border-radius:50px;background:#161616;border:1px solid rgba(255,255,255,0.14);box-shadow:0 40px 90px rgba(0,0,0,0.6), 0 0 70px rgba(62,207,212,0.1)">
+<div style="position:relative;width:min(280px, 72vw);aspect-ratio:1206 / 2622;border-radius:40px;overflow:hidden;background:#0B0B0B">
+<span style="position:absolute;left:34.5%;top:1.4%;width:31%;height:4.2%;border-radius:999px;background:#000000"></span>
+<video data-coach="1" src="/media/coach.mp4" poster="/media/coach-poster.jpg" muted loop playsinline preload="metadata" aria-label="Screen recording: asking the Protocol coach why weight went up this week, and its answer" style="position:absolute;left:0;top:6.48%;width:100%;height:93.52%;object-fit:cover;display:block"></video>
+</div>
+</div>
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.45)">Real answer, real data</span>
+</div>
+</div>
+<div class="reveal" style="max-width:640px;min-height:78px;margin:40px auto 0;box-sizing:border-box;padding:16px 20px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:#101010;display:flex;align-items:center">
+<div data-show="q0" hidden><div class="rin" style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.5)">You ask</span><span style="font-size:16px;line-height:1.45;color:#FFFFFF">“Why is my weight up this week?”</span></div></div>
+<div data-show="q1" hidden><div class="rin" style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#3ECFD4">Coach is reading your data</span><span style="font-size:16px;line-height:1.45;color:#FFFFFF">Meals, weigh-ins, targets and trends, all in one context.</span></div></div>
+<div data-show="q2" hidden><div class="rin" style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#3ECFD4">Weight log</span><span style="font-size:16px;line-height:1.45;color:#FFFFFF">A 6 lb jump in a week is almost certainly not fat.</span></div></div>
+<div data-show="q3" hidden><div class="rin" style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#3ECFD4">Calorie target</span><span style="font-size:16px;line-height:1.45;color:#FFFFFF">It would take 21,000 calories over target, and that didn't happen.</span></div></div>
+<div data-show="q4" hidden><div class="rin" style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#3ECFD4">Meal log</span><span style="font-size:16px;line-height:1.45;color:#FFFFFF">Only 1 day of intake is logged, so there's no real trend yet.</span></div></div>
+<div data-show="q5" hidden><div class="rin" style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#3ECFD4">Weigh-ins</span><span style="font-size:16px;line-height:1.45;color:#FFFFFF">Weighing at different times of day can swing 2–4 lb on its own.</span></div></div>
+<div data-show="q6"><div class="rin" style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#3ECFD4">Adaptive engine</span><span style="font-size:16px;line-height:1.45;color:#FFFFFF">In about 5 more days it switches from a formula to your actual data.</span></div></div>
+</div>
+</section>
 
-    <section class="cta" id="download">
-        <div class="cta-glow"></div>
-        <div class="cta-content">
-            <h2>Ready to build discipline?</h2>
-            <p>Transform structure into strength. No gimmicks, just results.</p>
-            <div class="cta-buttons">
-                <a href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" class="btn-primary">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                    Download for iOS
-                </a>
-                <a href="mailto:support@protocolapp.ai" class="btn-secondary">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                    Contact Us
-                </a>
-            </div>
-        </div>
-    </section>
+<section id="bodyscan" style="max-width:1200px;margin:0 auto;padding:40px 24px 120px;box-sizing:border-box">
+<div style="display:flex;flex-wrap:wrap;gap:64px;align-items:center;justify-content:center">
+<div style="flex:0 0 auto;display:flex;justify-content:center">
+<div class="reveal" style="padding:10px;border-radius:50px;background:#161616;border:1px solid rgba(255,255,255,0.14);box-shadow:0 40px 90px rgba(0,0,0,0.6), 0 0 70px rgba(212,160,62,0.08)">
+<div style="position:relative;width:min(280px, 72vw);aspect-ratio:1206 / 2622;border-radius:40px;overflow:hidden;background:#0B0B0B">
+<span style="position:absolute;left:34.5%;top:1.4%;width:31%;height:4.2%;border-radius:999px;background:#000000"></span>
+<video data-body="1" src="/media/body-scan.mp4" poster="/media/body-scan-poster.jpg" muted loop playsinline preload="metadata" aria-label="Protocol body scan result: estimated body fat, measurements, and a protein target linked to lean mass" style="position:absolute;left:0;top:6.48%;width:100%;height:93.52%;object-fit:cover;display:block"></video>
+</div>
+</div>
+</div>
+<div style="flex:1 1 420px;min-width:0;max-width:540px;display:flex;flex-direction:column;gap:22px">
+<p class="reveal" style="margin:0;font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#3ECFD4">Body Scans</p>
+<h2 class="reveal" style="margin:0;font-size:clamp(34px, 4.4vw, 52px);line-height:1.04;font-weight:800;letter-spacing:-0.03em">Scan once. <span style="color:#D4A03E">Protein follows.</span></h2>
+<p class="reveal" style="margin:0;font-size:17px;line-height:1.65;color:rgba(255,255,255,0.68)">AI estimates your body composition, sets your protein target from lean mass, and keeps it linked as your body changes.</p>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
+<div class="bstep" data-k="b0" style="display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55)">Estimated body fat</span>
+<span class="bval" style="font-size:24px;font-weight:800;letter-spacing:-0.02em;color:#FFFFFF">25.0%</span>
+<span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">Every scan comes with measurements and a confidence score.</span>
+</div>
+<div class="bstep" data-k="b1" style="display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55)">Lean body mass</span>
+<span class="bval" style="font-size:24px;font-weight:800;letter-spacing:-0.02em;color:#FFFFFF">175.5 lb × 0.82 g/lb</span>
+<span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">The Protocol system turns your lean mass into a protein target.</span>
+</div>
+<div class="bstep" data-k="b2" style="display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55)">Protein target</span>
+<span class="bval" style="font-size:24px;font-weight:800;letter-spacing:-0.02em;color:#FFFFFF">211 g → 145 g</span>
+<span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">Linked to your scan, so it adjusts as your body changes.</span>
+</div>
+</div>
+</div>
+</div>
+</section>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-links"><a href="privacy.html">Privacy</a><a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" rel="noopener">Terms</a><a href="support.html">Support</a><a href="https://protocol-ai-backend-136ff028e7cc.herokuapp.com/sentinel/dashboard">Coach Portal</a></div>
-            <div class="footer-copyright">© 2026 Protocol</div>
-        </div>
-    </footer>
+<section id="cycling" style="max-width:1200px;margin:0 auto;padding:0 24px 120px;box-sizing:border-box">
+<div style="display:flex;flex-wrap:wrap-reverse;gap:64px;align-items:center;justify-content:center">
+<div style="flex:1 1 420px;min-width:0;max-width:540px;display:flex;flex-direction:column;gap:22px">
+<p class="reveal" style="margin:0;font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#3ECFD4">Calorie Cycling</p>
+<h2 class="reveal" style="margin:0;font-size:clamp(34px, 4.4vw, 52px);line-height:1.04;font-weight:800;letter-spacing:-0.03em">Match your fuel <span style="color:#D4A03E">to the day.</span></h2>
+<p class="reveal" style="margin:0;font-size:17px;line-height:1.65;color:rgba(255,255,255,0.68)">Pick today's cycle day and Protocol recalculates your target and macros, while your weekly budget keeps the whole week on track.</p>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
+<div class="bstep" data-k="k0" style="display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55)">Moderate day</span>
+<span class="bval" style="font-size:24px;font-weight:800;letter-spacing:-0.02em;color:#FFFFFF">2,455 kcal</span>
+<span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">Standard deficit day. Balanced macros within target.</span>
+</div>
+<div class="bstep" data-k="k1" style="display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55)">Cycle configuration</span>
+<span class="bval" style="font-size:17px;font-weight:800;letter-spacing:-0.01em;line-height:1.4;color:#FFFFFF">Low 85% · Moderate 100% · High 114% · Refeed 125%</span>
+<span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">Protein comes from your body scan or formula. Carbs and fats are calculated for the day.</span>
+</div>
+<div class="bstep" data-k="k2" style="display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55)">High day</span>
+<span class="bval" style="font-size:24px;font-weight:800;letter-spacing:-0.02em;color:#FFFFFF">3,246 kcal</span>
+<span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">Higher calorie day. Useful around demanding training days.</span>
+</div>
+<div class="bstep" data-k="k3" style="display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55)">Refeed day</span>
+<span class="bval" style="font-size:24px;font-weight:800;letter-spacing:-0.02em;color:#FFFFFF">3,529 kcal</span>
+<span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,0.6)">Carbs climb, fat drops, and the weekly budget updates to match.</span>
+</div>
+</div>
+</div>
+<div style="flex:0 0 auto;display:flex;justify-content:center">
+<div class="reveal" style="padding:10px;border-radius:50px;background:#161616;border:1px solid rgba(255,255,255,0.14);box-shadow:0 40px 90px rgba(0,0,0,0.6), 0 0 70px rgba(62,207,212,0.1)">
+<div style="position:relative;width:min(280px, 72vw);aspect-ratio:1206 / 2622;border-radius:40px;overflow:hidden;background:#0B0B0B">
+<span style="position:absolute;left:34.5%;top:1.4%;width:31%;height:4.2%;border-radius:999px;background:#000000"></span>
+<video data-cal="1" src="/media/calorie-cycle.mp4" poster="/media/calorie-cycle-poster.jpg" muted loop playsinline preload="metadata" aria-label="Screen recording: changing today's cycle day in Protocol from moderate to high and refeed, and the calorie target updating" style="position:absolute;left:0;top:6.48%;width:100%;height:93.52%;object-fit:cover;display:block"></video>
+</div>
+</div>
+</div>
+</div>
+</section>
 
-    <div class="progress-bar"><div class="progress-bar-fill" id="progressBar"></div></div>
+<section id="features" style="max-width:1200px;margin:0 auto;padding:40px 24px 120px;box-sizing:border-box">
+<div class="reveal" style="display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;margin-bottom:56px">
+<p style="margin:0;font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#3ECFD4">Features</p>
+<h2 style="margin:0;font-size:clamp(36px, 5vw, 60px);line-height:1.02;font-weight:800;letter-spacing:-0.035em">Built for <span style="color:#3ECFD4">Discipline</span></h2>
+<p style="margin:0;max-width:560px;font-size:18px;line-height:1.6;color:rgba(255,255,255,0.68)">Eight powerful features designed to keep you consistent, accountable, and progressing.</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(340px, 100%), 1fr));gap:20px">
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Create hero dot grid
-            const dotGrid = document.getElementById('dotGrid');
-            for (let i = 0; i < 81; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'grid-dot';
-                dotGrid.appendChild(dot);
-            }
-            
-            // Create hero particles
-            const particles = document.getElementById('particles');
-            for (let i = 0; i < 20; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particles.appendChild(particle);
-            }
-            
-            // Create mobile particles
-            const mobileParticles = document.getElementById('mobileParticles');
-            if (mobileParticles) {
-                for (let i = 0; i < 15; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'mobile-particle';
-                    particle.style.left = Math.random() * 100 + '%';
-                    particle.style.top = Math.random() * 100 + '%';
-                    mobileParticles.appendChild(particle);
-                }
-            }
-            
-            // Loader
-            setTimeout(() => {
-                document.querySelector('.loader').classList.add('hidden');
-                startAnimations();
-            }, 600);
+<article class="fcard reveal" style="display:flex;flex-direction:column;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;overflow:hidden">
+<div aria-hidden="true" style="position:relative;height:260px;background:#0C0C0C;border-bottom:1px solid rgba(255,255,255,0.06);overflow:hidden">
+<div style="position:absolute;left:50%;top:0;width:320px;height:260px;margin-left:-160px">
+<div style="position:absolute;left:0;right:0;top:12px;display:flex;justify-content:center;gap:10px;font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase">
+<span class="m-p1" style="color:rgba(255,255,255,0.5)">Point</span><span style="color:rgba(255,255,255,0.25)">/</span><span class="m-p2" style="color:rgba(255,255,255,0.5)">Shoot</span><span style="color:rgba(255,255,255,0.25)">/</span><span class="m-p3" style="color:#3ECFD4">Logged</span>
+</div>
+<div style="position:absolute;left:98px;top:49px;width:124px;height:124px;border-radius:50%;background:#171717;border:1px solid rgba(255,255,255,0.12);box-sizing:border-box"></div>
+<div style="position:absolute;left:112px;top:63px;width:96px;height:96px;border-radius:50%;border:1px solid rgba(255,255,255,0.06);box-sizing:border-box"></div>
+<div style="position:absolute;left:114px;top:90px;width:54px;height:32px;border-radius:14px 18px 12px 16px;background:#9A7448"></div>
+<div style="position:absolute;left:166px;top:80px;width:42px;height:38px;border-radius:50%;background:#DCD5C6"></div>
+<div style="position:absolute;left:132px;top:124px;width:48px;height:28px;border-radius:16px 12px 18px 10px;background:#4E7A50"></div>
+<div class="m-flash" style="position:absolute;left:85px;top:36px;width:150px;height:150px;border-radius:4px;background:#FFFFFF;opacity:0"></div>
+<div class="m-det" style="position:absolute;left:110px;top:86px;width:62px;height:40px;border:1px solid rgba(62,207,212,0.9);border-radius:6px;box-sizing:border-box"></div>
+<div class="m-det md2" style="position:absolute;left:162px;top:76px;width:50px;height:46px;border:1px solid rgba(62,207,212,0.9);border-radius:6px;box-sizing:border-box"></div>
+<div class="m-det md3" style="position:absolute;left:128px;top:120px;width:56px;height:36px;border:1px solid rgba(62,207,212,0.9);border-radius:6px;box-sizing:border-box"></div>
+<div class="m-det" style="position:absolute;left:6px;top:88px;width:74px;text-align:right;font-family:'JetBrains Mono', monospace;font-size:11px;line-height:1.4"><span style="display:block;color:#FFFFFF">Chicken</span><span style="display:block;color:rgba(255,255,255,0.55)">180 g</span></div>
+<div class="m-det md2" style="position:absolute;left:242px;top:78px;width:74px;font-family:'JetBrains Mono', monospace;font-size:11px;line-height:1.4"><span style="display:block;color:#FFFFFF">Rice</span><span style="display:block;color:rgba(255,255,255,0.55)">150 g</span></div>
+<div class="m-det md3" style="position:absolute;left:242px;top:128px;width:74px;font-family:'JetBrains Mono', monospace;font-size:11px;line-height:1.4"><span style="display:block;color:#FFFFFF">Greens</span><span style="display:block;color:rgba(255,255,255,0.55)">60 g</span></div>
+<div class="m-vf" style="position:absolute;left:85px;top:36px;width:150px;height:150px">
+<span style="position:absolute;left:0;top:0;width:20px;height:20px;border-left:2px solid #3ECFD4;border-top:2px solid #3ECFD4"></span>
+<span style="position:absolute;right:0;top:0;width:20px;height:20px;border-right:2px solid #3ECFD4;border-top:2px solid #3ECFD4"></span>
+<span style="position:absolute;left:0;bottom:0;width:20px;height:20px;border-left:2px solid #3ECFD4;border-bottom:2px solid #3ECFD4"></span>
+<span style="position:absolute;right:0;bottom:0;width:20px;height:20px;border-right:2px solid #3ECFD4;border-bottom:2px solid #3ECFD4"></span>
+<span class="m-scan" style="position:absolute;left:4px;right:4px;top:1px;height:2px;background:#3ECFD4;opacity:0;box-shadow:0 0 12px rgba(62,207,212,0.8)"></span>
+</div>
+<div class="m-card" style="position:absolute;left:30px;top:198px;width:260px;height:48px;box-sizing:border-box;padding:0 14px;border-radius:12px;background:#151515;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;gap:10px">
+<span style="display:flex;align-items:center;gap:8px"><span style="width:18px;height:18px;border-radius:50%;background:#3ECFD4;color:#0A0A0A;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:4;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span style="font-size:15px;font-weight:800">612 kcal</span></span>
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.7)">P 48 · C 62 · F 18</span>
+</div>
+</div>
+</div>
+<div style="padding:22px 24px 26px;display:flex;flex-direction:column;gap:8px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.5)">01</span>
+<h3 style="margin:0;font-size:20px;font-weight:700;color:#3ECFD4">AI Meal Scanning</h3>
+<p style="margin:0;font-size:15px;line-height:1.6;color:rgba(255,255,255,0.7)">Point. Shoot. Logged. Instant macro estimates from any meal photo.</p>
+</div>
+</article>
 
-            function startAnimations() {
-                // Nav
-                anime({ targets: 'nav', translateY: ['-100%', '0%'], duration: 800, easing: 'easeOutExpo', delay: 100 });
-                anime({ targets: '.logo, .nav-link, .nav-cta', opacity: [0, 1], translateY: [-20, 0], duration: 800, delay: anime.stagger(100, {start: 300}), easing: 'easeOutExpo' });
-                
-                // Hero SVG rings
-                anime({ targets: '.ring', opacity: [0, 0.6], strokeDashoffset: [anime.setDashoffset, 0], duration: 2000, delay: anime.stagger(150, {start: 400}), easing: 'easeOutExpo' });
-                anime({ targets: '.ring-outer', rotate: 360, duration: 60000, loop: true, easing: 'linear' });
-                anime({ targets: '.ring-mid-1', rotate: -360, duration: 45000, loop: true, easing: 'linear' });
-                anime({ targets: '.ring-mid-2', rotate: 360, duration: 30000, loop: true, easing: 'linear' });
-                anime({ targets: '.ring-inner', rotate: -360, duration: 20000, loop: true, easing: 'linear' });
-                
-                // Center triangle
-                anime({ targets: '.center-triangle', opacity: [0, 1], scale: [0.5, 1], duration: 1200, delay: 800, easing: 'easeOutElastic(1, .6)' });
-                anime({ targets: '.center-triangle', rotate: 360, duration: 25000, loop: true, easing: 'linear' });
-                
-                // Accent arcs
-                anime({ targets: '.accent-arc', opacity: [0, 1], strokeDashoffset: [anime.setDashoffset, 0], duration: 1500, delay: anime.stagger(200, {start: 600}), easing: 'easeInOutQuart' });
-                anime({ targets: '.arc-1', rotate: [0, 360], duration: 40000, loop: true, easing: 'linear' });
-                anime({ targets: '.arc-2', rotate: [0, -360], duration: 35000, loop: true, easing: 'linear' });
-                
-                // Orbiting dots
-                const orbitDots = document.querySelectorAll('.orbit-dot');
-                orbitDots.forEach((dot, i) => {
-                    const angle = (i / orbitDots.length) * Math.PI * 2;
-                    const radius = 180;
-                    anime({ targets: dot, opacity: [0, 1], duration: 400, delay: 800 + i * 80, easing: 'easeOutExpo' });
-                    anime({
-                        targets: dot,
-                        translateX: () => [Math.cos(angle) * radius - 200, Math.cos(angle + Math.PI * 2) * radius - 200],
-                        translateY: () => [Math.sin(angle) * radius - 200, Math.sin(angle + Math.PI * 2) * radius - 200],
-                        duration: 15000, loop: true, easing: 'linear'
-                    });
-                });
-                
-                // Dot grid stagger
-                anime({ targets: '.grid-dot', scale: [0, 1], opacity: [0, 0.5], delay: anime.stagger(25, {grid: [9, 9], from: 'center'}), duration: 800, easing: 'easeOutExpo' });
-                anime({ targets: '.grid-dot', scale: [1, 1.4, 1], opacity: [0.5, 0.9, 0.5], delay: anime.stagger(40, {grid: [9, 9], from: 'center', start: 1800}), duration: 2500, loop: true, easing: 'easeInOutQuad' });
-                
-                // Floating particles
-                document.querySelectorAll('.particle').forEach(particle => {
-                    anime({
-                        targets: particle, opacity: [0, 0.7, 0], translateY: [0, -80],
-                        translateX: () => anime.random(-40, 40), scale: [0, 1, 0],
-                        duration: () => anime.random(2500, 5000), delay: () => anime.random(0, 2500),
-                        loop: true, easing: 'easeInOutQuad'
-                    });
-                });
-                
-                // Mobile particles
-                document.querySelectorAll('.mobile-particle').forEach(particle => {
-                    anime({
-                        targets: particle, opacity: [0, 0.5, 0],
-                        translateY: () => anime.random(-100, -200),
-                        translateX: () => anime.random(-30, 30),
-                        scale: [0, 1.2, 0],
-                        duration: () => anime.random(4000, 7000),
-                        delay: () => anime.random(0, 4000),
-                        loop: true, easing: 'easeInOutSine'
-                    });
-                });
-                
-                // Hero content
-                anime({ targets: '.hero-badge', opacity: [0, 1], translateY: [20, 0], duration: 800, delay: 500, easing: 'easeOutExpo' });
-                anime({ targets: '.hero-title', opacity: [0, 1], duration: 100, delay: 600 });
-                anime({ targets: '.hero-title .word', translateY: ['100%', '0%'], duration: 1000, delay: anime.stagger(120, {start: 700}), easing: 'easeOutExpo' });
-                anime({ targets: '.hero-subtitle', opacity: [0, 1], translateY: [20, 0], duration: 800, delay: 1000, easing: 'easeOutExpo' });
-                anime({ targets: '.hero-cta', opacity: [0, 1], translateY: [20, 0], scale: [0.9, 1], duration: 800, delay: 1200, easing: 'easeOutExpo' });
-                anime({ targets: '.scroll-indicator', opacity: [0, 1], duration: 800, delay: 1800, easing: 'easeOutExpo' });
-            }
+<article class="fcard reveal" style="display:flex;flex-direction:column;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;overflow:hidden">
+<div aria-hidden="true" style="position:relative;height:260px;background:#0C0C0C;border-bottom:1px solid rgba(255,255,255,0.06);overflow:hidden">
+<div style="position:absolute;left:50%;top:0;width:320px;height:260px;margin-left:-160px">
+<div style="position:absolute;left:20px;right:20px;top:14px;display:flex;justify-content:space-between;align-items:baseline">
+<span style="font-size:14px;font-weight:700">Bench press</span>
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55)">Today</span>
+</div>
+<div class="w-row d1" style="position:absolute;left:20px;right:20px;top:44px;height:34px;padding:0 12px;box-sizing:border-box;border-radius:10px;background:#151515;border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:12px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55);width:40px">Set 1</span>
+<span style="font-size:13px;font-weight:600;flex:1">135 lb × 10</span>
+<span class="w-chk d1" style="width:18px;height:18px;border-radius:50%;border:1px solid #3ECFD4;background:#3ECFD4;color:#0A0A0A;display:flex;align-items:center;justify-content:center;box-sizing:border-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:4;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+</div>
+<div class="w-row d2" style="position:absolute;left:20px;right:20px;top:86px;height:34px;padding:0 12px;box-sizing:border-box;border-radius:10px;background:#151515;border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:12px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55);width:40px">Set 2</span>
+<span style="font-size:13px;font-weight:600;flex:1">155 lb × 8</span>
+<span class="w-chk d2" style="width:18px;height:18px;border-radius:50%;border:1px solid #3ECFD4;background:#3ECFD4;color:#0A0A0A;display:flex;align-items:center;justify-content:center;box-sizing:border-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:4;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+</div>
+<div class="w-row d3" style="position:absolute;left:20px;right:20px;top:128px;height:34px;padding:0 12px;box-sizing:border-box;border-radius:10px;background:#151515;border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:12px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55);width:40px">Set 3</span>
+<span style="font-size:13px;font-weight:600;flex:1">175 lb × 6</span>
+<span class="w-pr" style="font-size:11px;font-weight:800;letter-spacing:0.06em;color:#0A0A0A;background:#D4A03E;border-radius:999px;padding:3px 8px">PR</span>
+<span class="w-chk d3" style="width:18px;height:18px;border-radius:50%;border:1px solid #3ECFD4;background:#3ECFD4;color:#0A0A0A;display:flex;align-items:center;justify-content:center;box-sizing:border-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:4;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+</div>
+<div style="position:absolute;left:20px;top:176px;font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55)">Weekly volume</div>
+<div style="position:absolute;left:20px;right:20px;top:196px;height:48px;display:flex;align-items:flex-end;gap:10px">
+<span style="flex:1;height:20px;border-radius:4px 4px 2px 2px;background:rgba(255,255,255,0.14)"></span>
+<span style="flex:1;height:24px;border-radius:4px 4px 2px 2px;background:rgba(255,255,255,0.14)"></span>
+<span style="flex:1;height:23px;border-radius:4px 4px 2px 2px;background:rgba(255,255,255,0.14)"></span>
+<span style="flex:1;height:29px;border-radius:4px 4px 2px 2px;background:rgba(255,255,255,0.14)"></span>
+<span style="flex:1;height:31px;border-radius:4px 4px 2px 2px;background:rgba(255,255,255,0.14)"></span>
+<span style="flex:1;height:36px;border-radius:4px 4px 2px 2px;background:rgba(255,255,255,0.14)"></span>
+<span class="w-bar" style="flex:1;height:48px;border-radius:4px 4px 2px 2px;background:#D4A03E"></span>
+</div>
+</div>
+</div>
+<div style="padding:22px 24px 26px;display:flex;flex-direction:column;gap:8px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.5)">02</span>
+<h3 style="margin:0;font-size:20px;font-weight:700;color:#3ECFD4">Workout Tracking</h3>
+<p style="margin:0;font-size:15px;line-height:1.6;color:rgba(255,255,255,0.7)">Log sets, track PRs, monitor volume with analytics that matter.</p>
+</div>
+</article>
 
-            // Intersection Observer for scroll animations
-            const observerOptions = { threshold: 0.2, rootMargin: '0px 0px -80px 0px' };
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const target = entry.target;
-                        
-                        if (target.classList.contains('features-header')) {
-                            anime({ targets: target, opacity: [0, 1], translateY: [30, 0], duration: 800, easing: 'easeOutExpo' });
-                        }
-                        
-                        if (target.classList.contains('feature-card')) {
-                            target.classList.add('visible');
-                            const index = parseInt(target.dataset.index) || 1;
-                            
-                            // Main card animation
-                            anime({
-                                targets: target,
-                                opacity: [0, 1],
-                                translateY: [80, 0],
-                                scale: [0.9, 1],
-                                duration: 900,
-                                easing: 'easeOutExpo'
-                            });
-                            
-                            // Update progress line
-                            const progressFill = document.getElementById('featureProgressFill');
-                            if (progressFill) {
-                                const progress = (index / 6) * 100;
-                                anime({
-                                    targets: progressFill,
-                                    height: progress + '%',
-                                    duration: 600,
-                                    easing: 'easeOutExpo'
-                                });
-                            }
-                        }
-                        
-                        if (target.classList.contains('stats-header')) {
-                            anime({ targets: target, opacity: [0, 1], translateY: [20, 0], duration: 800, easing: 'easeOutExpo' });
-                        }
-                        
-                        if (target.classList.contains('stat-item')) {
-                            target.classList.add('visible');
-                            const index = Array.from(document.querySelectorAll('.stat-item')).indexOf(target);
-                            
-                            anime({
-                                targets: target,
-                                opacity: [0, 1],
-                                translateY: [40, 0],
-                                scale: [0.85, 1],
-                                duration: 700,
-                                delay: index * 100,
-                                easing: 'easeOutExpo'
-                            });
-                            
-                            // Animate number
-                            const valueEl = target.querySelector('.stat-value');
-                            if (valueEl) {
-                                const text = valueEl.textContent;
-                                const num = parseInt(text);
-                                if (!isNaN(num) && num > 0 && num <= 100) {
-                                    anime({
-                                        targets: { val: 0 },
-                                        val: num,
-                                        duration: 1200,
-                                        delay: index * 100,
-                                        easing: 'easeOutExpo',
-                                        round: 1,
-                                        update: function(anim) {
-                                            valueEl.textContent = anim.animations[0].currentValue;
-                                        },
-                                        complete: function() {
-                                            valueEl.textContent = text;
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                        
-                        if (target.classList.contains('cta-content')) {
-                            anime({ targets: target, opacity: [0, 1], translateY: [30, 0], duration: 800, easing: 'easeOutExpo' });
-                            anime({ targets: '.btn-primary', opacity: [0, 1], translateY: [20, 0], scale: [0.9, 1], duration: 700, delay: 150, easing: 'easeOutExpo' });
-                            anime({ targets: '.btn-secondary', opacity: [0, 1], translateY: [20, 0], duration: 700, delay: 250, easing: 'easeOutExpo' });
-                        }
-                        
-                        observer.unobserve(target);
-                    }
-                });
-            }, observerOptions);
-            
-            document.querySelectorAll('.features-header, .feature-card, .stats-header, .stat-item, .cta-content').forEach(el => {
-                observer.observe(el);
-            });
+<article class="fcard reveal" style="display:flex;flex-direction:column;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;overflow:hidden">
+<div aria-hidden="true" style="position:relative;height:260px;background:#0C0C0C;border-bottom:1px solid rgba(255,255,255,0.06);overflow:hidden">
+<div style="position:absolute;left:50%;top:0;width:320px;height:260px;margin-left:-160px">
+<div style="position:absolute;left:16px;right:16px;top:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.5);margin-right:2px">Context</span>
+<span class="c-ctx" style="font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid rgba(255,255,255,0.16);color:rgba(255,255,255,0.72)">Lean bulk</span>
+<span style="font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid rgba(255,255,255,0.16);color:rgba(255,255,255,0.72)">4×/week</span>
+<span class="c-ctx" style="font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid rgba(255,255,255,0.16);color:rgba(255,255,255,0.72)">No dairy</span>
+</div>
+<div class="c-user" style="position:absolute;right:16px;top:54px;max-width:200px;padding:9px 13px;border-radius:14px 14px 4px 14px;background:#1C1C1C;font-size:13px;line-height:1.4">What should dinner be?</div>
+<div style="position:absolute;left:16px;top:98px;display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono', monospace;font-size:11px;color:#3ECFD4"><span style="width:6px;height:6px;border-radius:50%;background:#3ECFD4"></span>AI Coach</div>
+<div class="c-typing" style="position:absolute;left:16px;top:118px;padding:12px 14px;border-radius:14px 14px 14px 4px;background:rgba(62,207,212,0.08);border:1px solid rgba(62,207,212,0.25);display:flex;gap:5px;opacity:0">
+<span class="c-dot" style="width:6px;height:6px;border-radius:50%;background:#3ECFD4"></span>
+<span class="c-dot c-dot2" style="width:6px;height:6px;border-radius:50%;background:#3ECFD4"></span>
+<span class="c-dot c-dot3" style="width:6px;height:6px;border-radius:50%;background:#3ECFD4"></span>
+</div>
+<div class="c-bot" style="position:absolute;left:16px;top:118px;width:262px;padding:11px 14px;box-sizing:border-box;border-radius:14px 14px 14px 4px;background:rgba(62,207,212,0.08);border:1px solid rgba(62,207,212,0.25);font-size:13px;line-height:1.5;color:#FFFFFF">
+<span class="c-text" style="display:block">You're 38 g short on protein. Salmon, rice and greens closes the gap and keeps you inside today's budget.</span>
+</div>
+</div>
+</div>
+<div style="padding:22px 24px 26px;display:flex;flex-direction:column;gap:8px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.5)">03</span>
+<h3 style="margin:0;font-size:20px;font-weight:700;color:#3ECFD4">AI Coach</h3>
+<p style="margin:0;font-size:15px;line-height:1.6;color:rgba(255,255,255,0.7)">Contextual guidance that knows your goals and constraints.</p>
+</div>
+</article>
 
-            // Desktop features scroll
-            const featuresSection = document.querySelector('.features-desktop');
-            const featureLabels = document.querySelectorAll('.feature-label');
-            const featureScreenshots = document.querySelectorAll('.feature-screenshot');
+<article class="fcard reveal" style="display:flex;flex-direction:column;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;overflow:hidden">
+<div aria-hidden="true" style="position:relative;height:260px;background:#0C0C0C;border-bottom:1px solid rgba(255,255,255,0.06);overflow:hidden">
+<div style="position:absolute;left:50%;top:0;width:320px;height:260px;margin-left:-160px">
+<div style="position:absolute;left:16px;right:16px;top:12px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55)">
+<span>Weight · 14 days</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#D4A03E"></span>On target</span>
+</div>
+<svg width="288" height="164" viewBox="0 0 288 164" style="position:absolute;left:16px;top:34px;overflow:visible">
+<line x1="0" y1="20" x2="288" y2="20" stroke="rgba(255,255,255,0.07)" style="stroke-dasharray:3 5"></line>
+<line x1="0" y1="58" x2="288" y2="58" stroke="rgba(255,255,255,0.07)" style="stroke-dasharray:3 5"></line>
+<line x1="0" y1="96" x2="288" y2="96" stroke="rgba(255,255,255,0.07)" style="stroke-dasharray:3 5"></line>
+<path class="p-line" d="M10 33 C 100 52, 190 80, 278 95" fill="none" stroke="#3ECFD4" pathLength="100" style="stroke-width:2;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:0"></path>
+<circle class="p-dot" cx="10" cy="37" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:0s"></circle>
+<circle class="p-dot" cx="30.6" cy="20.3" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.07s"></circle>
+<circle class="p-dot" cx="51.2" cy="45.4" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.14s"></circle>
+<circle class="p-dot" cx="71.8" cy="53.7" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.21s"></circle>
+<circle class="p-dot" cx="92.4" cy="32.9" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.28s"></circle>
+<circle class="p-dot" cx="113" cy="62.1" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.35s"></circle>
+<circle class="p-dot" cx="133.6" cy="70.4" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.42s"></circle>
+<circle class="p-dot" cx="154.2" cy="57.9" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.49s"></circle>
+<circle class="p-dot" cx="174.8" cy="78.8" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.56s"></circle>
+<circle class="p-dot" cx="195.4" cy="83" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.63s"></circle>
+<circle class="p-dot" cx="216" cy="70.4" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.7s"></circle>
+<circle class="p-dot" cx="236.6" cy="95.5" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.77s"></circle>
+<circle class="p-dot" cx="257.2" cy="91.3" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.84s"></circle>
+<circle class="p-dot" cx="277.8" cy="95.5" r="2.6" fill="rgba(255,255,255,0.6)" style="animation-delay:.91s"></circle>
+<rect class="p-bar" x="4" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:0s"></rect>
+<rect class="p-bar" x="24.6" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.04s"></rect>
+<rect class="p-bar" x="45.2" y="146" width="12" height="10" rx="2" fill="rgba(255,255,255,0.18)" style="animation-delay:.08s"></rect>
+<rect class="p-bar" x="65.8" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.12s"></rect>
+<rect class="p-bar" x="86.4" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.16s"></rect>
+<rect class="p-bar" x="107" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.2s"></rect>
+<rect class="p-bar" x="127.6" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.24s"></rect>
+<rect class="p-bar" x="148.2" y="146" width="12" height="10" rx="2" fill="rgba(255,255,255,0.18)" style="animation-delay:.28s"></rect>
+<rect class="p-bar" x="168.8" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.32s"></rect>
+<rect class="p-bar" x="189.4" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.36s"></rect>
+<rect class="p-bar" x="210" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.4s"></rect>
+<rect class="p-bar" x="230.6" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.44s"></rect>
+<rect class="p-bar" x="251.2" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.48s"></rect>
+<rect class="p-bar" x="271.8" y="130" width="12" height="26" rx="2" fill="#D4A03E" style="animation-delay:.52s"></rect>
+</svg>
+<div class="p-ins" style="position:absolute;left:16px;right:16px;top:208px;padding:10px 12px;box-sizing:border-box;border-radius:12px;background:#151515;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px">
+<span style="width:8px;height:8px;border-radius:50%;background:#3ECFD4;flex:none"></span>
+<span style="font-size:12px;line-height:1.35;color:rgba(255,255,255,0.88)">Down 0.7 lb/week at 86% compliance</span>
+</div>
+</div>
+</div>
+<div style="padding:22px 24px 26px;display:flex;flex-direction:column;gap:8px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.5)">04</span>
+<h3 style="margin:0;font-size:20px;font-weight:700;color:#3ECFD4">Progress Analytics</h3>
+<p style="margin:0;font-size:15px;line-height:1.6;color:rgba(255,255,255,0.7)">Weekly trends and compliance tracking. Data interpreted.</p>
+</div>
+</article>
 
-            function updateFeatures() {
-                if (!featuresSection || window.innerWidth <= 900) return;
-                const rect = featuresSection.getBoundingClientRect();
-                const sectionHeight = featuresSection.offsetHeight;
-                const scrollProgress = Math.max(0, Math.min(1, -rect.top / (sectionHeight - window.innerHeight)));
-                const featureIndex = Math.min(Math.floor(scrollProgress * 6), 5);
-                featureLabels.forEach(label => { label.classList.toggle('active', parseInt(label.dataset.feature) === featureIndex); });
-                featureScreenshots.forEach(ss => { ss.classList.toggle('active', parseInt(ss.dataset.feature) === featureIndex); });
-            }
+<article class="fcard reveal" style="display:flex;flex-direction:column;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;overflow:hidden">
+<div aria-hidden="true" style="position:relative;height:260px;background:#0C0C0C;border-bottom:1px solid rgba(255,255,255,0.06);overflow:hidden">
+<div style="position:absolute;left:50%;top:0;width:320px;height:260px;margin-left:-160px">
+<div style="position:absolute;left:20px;right:20px;top:12px;display:flex;justify-content:space-between;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:2px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55)">Weekly budget</span>
+<span style="font-size:16px;font-weight:800">15,400 kcal</span>
+</div>
+<div style="position:relative;width:110px;height:20px;font-family:'JetBrains Mono', monospace;font-size:11px">
+<span class="k-flat" style="position:absolute;right:0;top:2px;color:rgba(255,255,255,0.55);opacity:0">Flat week</span>
+<span class="k-cyc" style="position:absolute;right:0;top:2px;color:#D4A03E">Cycled week</span>
+</div>
+</div>
+<div style="position:absolute;left:26px;right:26px;top:66px;height:130px;display:flex;align-items:flex-end;justify-content:space-between">
+<span class="kbh" style="width:28px;height:130px;border-radius:6px 6px 2px 2px;background:#D4A03E"></span>
+<span class="kbh" style="width:28px;height:130px;border-radius:6px 6px 2px 2px;background:#D4A03E"></span>
+<span class="kbl" style="width:28px;height:94px;border-radius:6px 6px 2px 2px;background:#3ECFD4"></span>
+<span class="kbh" style="width:28px;height:130px;border-radius:6px 6px 2px 2px;background:#D4A03E"></span>
+<span class="kbl" style="width:28px;height:94px;border-radius:6px 6px 2px 2px;background:#3ECFD4"></span>
+<span class="kbh" style="width:28px;height:130px;border-radius:6px 6px 2px 2px;background:#D4A03E"></span>
+<span class="kbl" style="width:28px;height:94px;border-radius:6px 6px 2px 2px;background:#3ECFD4"></span>
+</div>
+<div style="position:absolute;left:26px;right:26px;top:202px;display:flex;justify-content:space-between;font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.5)">
+<span style="width:28px;text-align:center">M</span><span style="width:28px;text-align:center">T</span><span style="width:28px;text-align:center">W</span><span style="width:28px;text-align:center">T</span><span style="width:28px;text-align:center">F</span><span style="width:28px;text-align:center">S</span><span style="width:28px;text-align:center">S</span>
+</div>
+<div style="position:absolute;left:20px;right:20px;top:224px;height:8px;display:flex;gap:2px">
+<span class="ksh" style="flex:25 1 0px;border-radius:2px;background:#D4A03E"></span>
+<span class="ksh" style="flex:25 1 0px;border-radius:2px;background:#D4A03E"></span>
+<span class="ksl" style="flex:18 1 0px;border-radius:2px;background:#3ECFD4"></span>
+<span class="ksh" style="flex:25 1 0px;border-radius:2px;background:#D4A03E"></span>
+<span class="ksl" style="flex:18 1 0px;border-radius:2px;background:#3ECFD4"></span>
+<span class="ksh" style="flex:25 1 0px;border-radius:2px;background:#D4A03E"></span>
+<span class="ksl" style="flex:18 1 0px;border-radius:2px;background:#3ECFD4"></span>
+</div>
+<div style="position:absolute;left:20px;right:20px;top:240px;display:flex;gap:14px;font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.6)">
+<span style="display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:2px;background:#D4A03E"></span>High 2,500</span>
+<span style="display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:2px;background:#3ECFD4"></span>Low 1,800</span>
+<span style="margin-left:auto">Same total</span>
+</div>
+</div>
+</div>
+<div style="padding:22px 24px 26px;display:flex;flex-direction:column;gap:8px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.5)">05</span>
+<h3 style="margin:0;font-size:20px;font-weight:700;color:#3ECFD4">Calorie Cycling</h3>
+<p style="margin:0;font-size:15px;line-height:1.6;color:rgba(255,255,255,0.7)">Intelligent high/low day distribution for your weekly budget.</p>
+</div>
+</article>
 
-            // Progress bar
-            const progressBar = document.getElementById('progressBar');
-            function updateProgressBar() {
-                const scrollTop = window.scrollY;
-                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-                progressBar.style.width = (scrollTop / docHeight) * 100 + '%';
-            }
+<article class="fcard reveal" style="display:flex;flex-direction:column;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;overflow:hidden">
+<div aria-hidden="true" style="position:relative;height:260px;background:#0C0C0C;border-bottom:1px solid rgba(255,255,255,0.06);overflow:hidden">
+<div style="position:absolute;left:50%;top:0;width:320px;height:260px;margin-left:-160px">
+<svg width="140" height="220" viewBox="0 0 140 220" style="position:absolute;left:28px;top:20px;overflow:visible">
+<defs>
+<clipPath id="bscan"><rect class="b-clip" x="0" y="0" width="140" height="220"></rect></clipPath>
+<clipPath id="bbody">
+<circle cx="70" cy="22" r="16"></circle>
+<rect x="46" y="44" width="48" height="78" rx="20"></rect>
+<rect x="26" y="48" width="14" height="82" rx="7" transform="rotate(9 33 48)"></rect>
+<rect x="100" y="48" width="14" height="82" rx="7" transform="rotate(-9 107 48)"></rect>
+<rect x="48" y="118" width="20" height="96" rx="10"></rect>
+<rect x="72" y="118" width="20" height="96" rx="10"></rect>
+</clipPath>
+</defs>
+<g fill="rgba(62,207,212,0.04)" stroke="rgba(62,207,212,0.4)" style="stroke-width:1.2">
+<circle cx="70" cy="22" r="16"></circle>
+<rect x="46" y="44" width="48" height="78" rx="20"></rect>
+<rect x="26" y="48" width="14" height="82" rx="7" transform="rotate(9 33 48)"></rect>
+<rect x="100" y="48" width="14" height="82" rx="7" transform="rotate(-9 107 48)"></rect>
+<rect x="48" y="118" width="20" height="96" rx="10"></rect>
+<rect x="72" y="118" width="20" height="96" rx="10"></rect>
+</g>
+<g class="b-fade" style="clip-path:url(#bscan)">
+<g fill="rgba(62,207,212,0.16)" stroke="#3ECFD4" style="stroke-width:1.2">
+<circle cx="70" cy="22" r="16"></circle>
+<rect x="46" y="44" width="48" height="78" rx="20"></rect>
+<rect x="26" y="48" width="14" height="82" rx="7" transform="rotate(9 33 48)"></rect>
+<rect x="100" y="48" width="14" height="82" rx="7" transform="rotate(-9 107 48)"></rect>
+<rect x="48" y="118" width="20" height="96" rx="10"></rect>
+<rect x="72" y="118" width="20" height="96" rx="10"></rect>
+</g>
+<g stroke="rgba(62,207,212,0.5)" style="clip-path:url(#bbody);stroke-width:0.6">
+<line x1="0" y1="12" x2="140" y2="12"></line>
+<line x1="0" y1="22" x2="140" y2="22"></line>
+<line x1="0" y1="32" x2="140" y2="32"></line>
+<line x1="0" y1="42" x2="140" y2="42"></line>
+<line x1="0" y1="52" x2="140" y2="52"></line>
+<line x1="0" y1="62" x2="140" y2="62"></line>
+<line x1="0" y1="72" x2="140" y2="72"></line>
+<line x1="0" y1="82" x2="140" y2="82"></line>
+<line x1="0" y1="92" x2="140" y2="92"></line>
+<line x1="0" y1="102" x2="140" y2="102"></line>
+<line x1="0" y1="112" x2="140" y2="112"></line>
+<line x1="0" y1="122" x2="140" y2="122"></line>
+<line x1="0" y1="132" x2="140" y2="132"></line>
+<line x1="0" y1="142" x2="140" y2="142"></line>
+<line x1="0" y1="152" x2="140" y2="152"></line>
+<line x1="0" y1="162" x2="140" y2="162"></line>
+<line x1="0" y1="172" x2="140" y2="172"></line>
+<line x1="0" y1="182" x2="140" y2="182"></line>
+<line x1="0" y1="192" x2="140" y2="192"></line>
+<line x1="0" y1="202" x2="140" y2="202"></line>
+<line x1="0" y1="212" x2="140" y2="212"></line>
+</g>
+</g>
+<line class="b-line" x1="8" y1="4" x2="132" y2="4" stroke="#3ECFD4" style="stroke-width:1.5;opacity:0"></line>
+</svg>
+<div class="b-r" style="position:absolute;left:184px;top:34px;display:flex;flex-direction:column;gap:2px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55)">Lean mass</span>
+<span style="font-size:22px;font-weight:800;letter-spacing:-0.02em">175.5 lb</span>
+</div>
+<div class="b-r b-r2" style="position:absolute;left:184px;top:92px;display:flex;flex-direction:column;gap:2px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55)">Confidence</span>
+<span style="font-size:22px;font-weight:800;letter-spacing:-0.02em">70%</span>
+</div>
+<div class="b-r b-r3" style="position:absolute;left:184px;top:150px;width:122px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.12);display:flex;flex-direction:column;gap:6px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55)">Protein target</span>
+<span style="display:flex;align-items:center;gap:8px"><span class="b-trk" style="position:relative;display:block;width:28px;height:16px;border-radius:999px;background:#3ECFD4;flex:none"><span class="b-tog" style="position:absolute;left:2px;top:2px;display:block;width:12px;height:12px;border-radius:50%;background:#FFFFFF;transform:translateX(12px)"></span></span><span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.7)">Scan-linked</span></span>
+<span style="position:relative;display:block;height:26px"><span class="b-va" style="position:absolute;left:0;top:0;font-size:22px;font-weight:800;letter-spacing:-0.02em;color:rgba(255,255,255,0.55);opacity:0">211 g</span><span class="b-vb" style="position:absolute;left:0;top:0;font-size:22px;font-weight:800;letter-spacing:-0.02em;color:#D4A03E">145 g</span></span>
+</div>
+</div>
+</div>
+<div style="padding:22px 24px 26px;display:flex;flex-direction:column;gap:8px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.5)">06</span>
+<h3 style="margin:0;font-size:20px;font-weight:700;color:#3ECFD4">Body Scans</h3>
+<p style="margin:0;font-size:15px;line-height:1.6;color:rgba(255,255,255,0.7)">AI composition analysis. Protein targets from lean mass.</p>
+</div>
+</article>
 
-            window.addEventListener('scroll', () => { updateFeatures(); updateProgressBar(); }, { passive: true });
-            updateFeatures();
-            updateProgressBar();
-        });
-    </script>
+</div>
+
+<article class="fcard reveal" style="margin-top:20px;display:flex;flex-direction:column;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;overflow:hidden">
+<div aria-hidden="true" style="padding:32px;box-sizing:border-box;background:#0C0C0C;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;flex-wrap:wrap;gap:40px;align-items:center;justify-content:center">
+<div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:16px">
+<div style="position:relative;width:240px;height:240px">
+<svg width="240" height="240" viewBox="0 0 280 280" style="display:block">
+<circle cx="140" cy="140" r="110" fill="none" stroke="rgba(255,255,255,0.06)" style="stroke-width:14"></circle>
+<circle cx="140" cy="140" r="110" fill="none" stroke="#D4A03E" pathLength="28" transform="rotate(-90 140 140)" style="stroke-width:14;stroke-dasharray:4.8 23.2;stroke-dashoffset:-0.1"></circle>
+<circle cx="140" cy="140" r="110" fill="none" stroke="rgba(255,255,255,0.3)" pathLength="28" transform="rotate(-90 140 140)" style="stroke-width:14;stroke-dasharray:7.8 20.2;stroke-dashoffset:-5.1"></circle>
+<circle cx="140" cy="140" r="110" fill="none" stroke="#3ECFD4" pathLength="28" transform="rotate(-90 140 140)" style="stroke-width:14;stroke-dasharray:2.8 25.2;stroke-dashoffset:-13.1"></circle>
+<circle cx="140" cy="140" r="110" fill="none" stroke="rgba(62,207,212,0.45)" pathLength="28" transform="rotate(-90 140 140)" style="stroke-width:14;stroke-dasharray:11.8 16.2;stroke-dashoffset:-16.1"></circle>
+<g class="cyc-m" style="transform:rotate(296deg)"><circle cx="140" cy="30" r="10" fill="#0A0A0A" stroke="#FFFFFF" style="stroke-width:3"></circle></g>
+</svg>
+<div style="position:absolute;left:0;top:0;width:240px;height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center">
+<span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.5)">Phase</span>
+<span style="position:relative;display:block;width:140px;height:26px">
+<span class="ph-m" style="position:absolute;left:0;right:0;top:0;font-size:20px;font-weight:800;color:#D4A03E;opacity:0">Menstrual</span>
+<span class="ph-f" style="position:absolute;left:0;right:0;top:0;font-size:20px;font-weight:800;color:#FFFFFF;opacity:0">Follicular</span>
+<span class="ph-o" style="position:absolute;left:0;right:0;top:0;font-size:20px;font-weight:800;color:#3ECFD4;opacity:0">Ovulation</span>
+<span class="ph-l" style="position:absolute;left:0;right:0;top:0;font-size:20px;font-weight:800;color:#8BE6E9">Luteal</span>
+</span>
+<span style="font-size:12px;color:rgba(255,255,255,0.5)">28-day cycle</span>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:6px 18px;font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.6)">
+<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#D4A03E;flex:none"></span>Menstrual</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,0.3);flex:none"></span>Follicular</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#3ECFD4;flex:none"></span>Ovulation</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(62,207,212,0.45);flex:none"></span>Luteal</span>
+</div>
+</div>
+<div style="flex:1 1 420px;min-width:0;max-width:640px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55)"><span>Weight · 28 days</span><span style="color:#3ECFD4">Trend −0.6 lb/week</span></div>
+<div style="position:relative">
+<svg viewBox="0 0 520 196" style="display:block;width:100%;height:auto;overflow:visible">
+<line x1="0" y1="40" x2="520" y2="40" stroke="rgba(255,255,255,0.06)" style="stroke-dasharray:3 5"></line>
+<line x1="0" y1="90" x2="520" y2="90" stroke="rgba(255,255,255,0.06)" style="stroke-dasharray:3 5"></line>
+<line x1="0" y1="140" x2="520" y2="140" stroke="rgba(255,255,255,0.06)" style="stroke-dasharray:3 5"></line>
+<rect class="wband" x="297" y="6" width="223" height="184" rx="6" fill="rgba(62,207,212,0.08)"></rect>
+<path d="M10 46 L510 163" fill="none" stroke="#3ECFD4" style="stroke-width:2.5;stroke-linecap:round"></path>
+<circle cx="10" cy="35.5" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="28.5" cy="66.4" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="47" cy="51" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="65.6" cy="71.6" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="84.1" cy="45.8" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="102.6" cy="71.6" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="121.1" cy="87.1" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="139.6" cy="66.4" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="158.1" cy="81.9" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="176.7" cy="97.4" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="195.2" cy="81.9" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="213.7" cy="102.6" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="232.2" cy="92.3" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="250.7" cy="112.9" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="269.3" cy="97.4" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="287.8" cy="118.1" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="306.3" cy="128.4" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="324.8" cy="128.4" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="343.3" cy="97.4" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="361.9" cy="97.4" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="380.4" cy="71.6" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="398.9" cy="76.8" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="417.4" cy="56.1" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="435.9" cy="56.1" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="454.4" cy="76.8" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="473" cy="107.7" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="491.5" cy="118.1" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<circle cx="510" cy="154.2" r="3" fill="rgba(255,255,255,0.6)"></circle>
+<line class="wcur" x1="10" y1="6" x2="10" y2="190" stroke="rgba(255,255,255,0.55)" style="stroke-width:1;stroke-dasharray:2 3;transform:translateX(426px)"></line>
+</svg>
+<span style="position:absolute;left:58.5%;top:10px;font-family:'JetBrains Mono', monospace;font-size:11px;color:#3ECFD4">Luteal phase</span>
+</div>
+<div class="wnote" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#151515;border:1px solid rgba(255,255,255,0.1);font-size:13px;line-height:1.4;color:rgba(255,255,255,0.88)"><span style="width:8px;height:8px;border-radius:50%;background:#3ECFD4;flex:none"></span>Luteal phase: water weight expected. Trend still down 0.6 lb/week.</div>
+<div style="display:flex;flex-wrap:wrap;gap:16px;font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.6)">
+<span style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.7);flex:none"></span>Daily weigh-ins</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:2px;background:#3ECFD4;flex:none"></span>Trend</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:8px;border-radius:2px;background:rgba(62,207,212,0.25);flex:none"></span>Luteal phase</span>
+</div>
+</div>
+</div>
+<div style="padding:22px 24px 26px;display:grid;grid-template-columns:repeat(auto-fit, minmax(min(300px, 100%), 1fr));gap:20px 32px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.5)">07</span>
+<h3 style="margin:0;font-size:20px;font-weight:700;color:#3ECFD4">Weight Tracking</h3>
+<p style="margin:0;font-size:15px;line-height:1.6;color:rgba(255,255,255,0.7)">Daily weigh-ins smoothed into a trend, so one heavy morning doesn't derail your week.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:rgba(255,255,255,0.5)">08</span>
+<h3 style="margin:0;font-size:20px;font-weight:700;color:#3ECFD4">Cycle Tracking</h3>
+<p style="margin:0;font-size:15px;line-height:1.6;color:rgba(255,255,255,0.7)">Your cycle phase feeds your weight trend and your coach, so water-weight swings get explained, not second-guessed.</p>
+</div>
+</div>
+</article>
+</section>
+
+<section style="max-width:1200px;margin:0 auto;padding:20px 24px 120px;box-sizing:border-box">
+<h2 class="reveal" style="margin:0 0 48px;text-align:center;font-size:clamp(34px, 4.4vw, 52px);font-weight:800;letter-spacing:-0.03em">The <span style="color:#3ECFD4">Numbers</span></h2>
+<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(240px, 100%), 1fr));gap:16px">
+
+<div class="reveal" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px 20px;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;text-align:center">
+<div aria-hidden="true" style="height:72px;display:flex;align-items:center;justify-content:center">
+<div style="display:grid;grid-template-columns:repeat(4, 18px);gap:6px">
+<span class="t-tile" style="width:18px;height:18px;box-sizing:border-box;border-radius:5px;border:1px solid #3ECFD4;background:rgba(62,207,212,0.18);animation-delay:0s"></span>
+<span class="t-tile" style="width:18px;height:18px;box-sizing:border-box;border-radius:5px;border:1px solid #3ECFD4;background:rgba(62,207,212,0.18);animation-delay:.12s"></span>
+<span class="t-tile" style="width:18px;height:18px;box-sizing:border-box;border-radius:5px;border:1px solid #3ECFD4;background:rgba(62,207,212,0.18);animation-delay:.24s"></span>
+<span class="t-tile" style="width:18px;height:18px;box-sizing:border-box;border-radius:5px;border:1px solid #3ECFD4;background:rgba(62,207,212,0.18);animation-delay:.36s"></span>
+<span class="t-tile" style="width:18px;height:18px;box-sizing:border-box;border-radius:5px;border:1px solid #3ECFD4;background:rgba(62,207,212,0.18);animation-delay:.48s"></span>
+<span class="t-tile" style="width:18px;height:18px;box-sizing:border-box;border-radius:5px;border:1px solid #3ECFD4;background:rgba(62,207,212,0.18);animation-delay:.6s"></span>
+<span class="t-tile" style="width:18px;height:18px;box-sizing:border-box;border-radius:5px;border:1px solid #3ECFD4;background:rgba(62,207,212,0.18);animation-delay:.72s"></span>
+<span class="t-tile" style="width:18px;height:18px;box-sizing:border-box;border-radius:5px;border:1px solid #3ECFD4;background:rgba(62,207,212,0.18);animation-delay:.84s"></span>
+</div>
+</div>
+<div style="font-size:56px;font-weight:800;line-height:1;letter-spacing:-0.04em;color:#D4A03E">8</div>
+<div style="font-size:13px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.62)">Core Features</div>
+</div>
+
+<div class="reveal" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px 20px;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;text-align:center">
+<div aria-hidden="true" style="height:72px;display:flex;align-items:center;justify-content:center">
+<svg width="72" height="72" viewBox="0 0 72 72">
+<circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.08)" style="stroke-width:3"></circle>
+<circle class="lk-ring" cx="36" cy="36" r="30" fill="none" stroke="#3ECFD4" pathLength="100" transform="rotate(-90 36 36)" style="stroke-width:3;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:0"></circle>
+<rect x="25" y="34" width="22" height="16" rx="3" fill="none" stroke="#FFFFFF" style="stroke-width:2.2"></rect>
+<path class="lk-sh" d="M29 34v-5a7 7 0 0 1 14 0v5" fill="none" stroke="#FFFFFF" style="stroke-width:2.2;stroke-linecap:round"></path>
+</svg>
+</div>
+<div style="font-size:56px;font-weight:800;line-height:1;letter-spacing:-0.04em;color:#D4A03E">100%</div>
+<div style="font-size:13px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.62)">Private</div>
+</div>
+
+<div class="reveal" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px 20px;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;text-align:center">
+<div aria-hidden="true" style="height:72px;display:flex;align-items:center;justify-content:center;gap:8px">
+<span class="ad" style="position:relative;width:34px;height:24px;box-sizing:border-box;border:1px dashed rgba(255,255,255,0.35);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55);opacity:0.35">AD<span class="ad-x" style="position:absolute;left:-3px;right:-3px;top:50%;height:2px;margin-top:-1px;background:#D4A03E;transform:rotate(-20deg)"></span></span>
+<span class="ad ad2" style="position:relative;width:34px;height:24px;box-sizing:border-box;border:1px dashed rgba(255,255,255,0.35);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55);opacity:0.35">AD<span class="ad-x ad2" style="position:absolute;left:-3px;right:-3px;top:50%;height:2px;margin-top:-1px;background:#D4A03E;transform:rotate(-20deg)"></span></span>
+<span class="ad ad3" style="position:relative;width:34px;height:24px;box-sizing:border-box;border:1px dashed rgba(255,255,255,0.35);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono', monospace;font-size:11px;color:rgba(255,255,255,0.55);opacity:0.35">AD<span class="ad-x ad3" style="position:absolute;left:-3px;right:-3px;top:50%;height:2px;margin-top:-1px;background:#D4A03E;transform:rotate(-20deg)"></span></span>
+</div>
+<div style="font-size:56px;font-weight:800;line-height:1;letter-spacing:-0.04em;color:#D4A03E">0</div>
+<div style="font-size:13px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.62)">Ads</div>
+</div>
+
+<div class="reveal" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px 20px;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:#101010;text-align:center">
+<div aria-hidden="true" style="height:72px;display:flex;align-items:center;justify-content:center">
+<svg width="72" height="72" viewBox="0 0 72 72">
+<circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.08)" style="stroke-width:3"></circle>
+<circle cx="36" cy="36" r="25" fill="none" stroke="rgba(255,255,255,0.3)" pathLength="24" style="stroke-width:4;stroke-dasharray:0.12 0.88"></circle>
+<circle cx="36" cy="36" r="25" fill="none" stroke="rgba(255,255,255,0.75)" pathLength="4" transform="rotate(-90 36 36)" style="stroke-width:6;stroke-dasharray:0.04 0.96;stroke-dashoffset:0.02"></circle>
+<g class="dial">
+<line x1="36" y1="36" x2="36" y2="15" stroke="#3ECFD4" style="stroke-width:2;stroke-linecap:round"></line>
+<circle cx="36" cy="15" r="2.6" fill="#3ECFD4"></circle>
+</g>
+<circle cx="36" cy="36" r="3" fill="#FFFFFF"></circle>
+</svg>
+</div>
+<div style="font-size:56px;font-weight:800;line-height:1;letter-spacing:-0.04em;color:#D4A03E">24/7</div>
+<div style="font-size:13px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.62)">AI Coach</div>
+</div>
+
+</div>
+</section>
+
+<section id="download" style="position:relative;overflow:hidden;border-top:1px solid rgba(255,255,255,0.06)">
+<div aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:100%;background-image:linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);background-size:46px 46px;background-position:center center"></div>
+<div class="cscan" aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:1px;background:rgba(62,207,212,0.55);box-shadow:0 0 18px rgba(62,207,212,0.6)"></div>
+<div class="reveal" style="position:relative;max-width:760px;margin:0 auto;padding:130px 24px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center">
+<h2 style="margin:0;font-size:clamp(38px, 5.4vw, 64px);line-height:1.02;font-weight:800;letter-spacing:-0.035em">Ready to build discipline?</h2>
+<p style="margin:0;font-size:19px;line-height:1.6;color:rgba(255,255,255,0.7)">Transform structure into strength. No gimmicks, just results.</p>
+<div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:8px">
+<a class="btn-gold" href="https://apps.apple.com/us/app/protocol-compliance-engine/id6756283460" style="display:inline-flex;align-items:center;gap:10px;min-height:54px;padding:0 28px;border-radius:999px;background:#D4A03E;color:#0A0A0A;font-weight:700;font-size:16px;text-decoration:none;box-shadow:0 0 40px rgba(212,160,62,0.4)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M12 4v11"></path><path d="M7 10.5l5 5 5-5"></path><path d="M5 20h14"></path></svg>Download for iOS</a>
+<a class="btn-ghost" href="mailto:support@protocolapp.ai" style="display:inline-flex;align-items:center;gap:10px;min-height:54px;padding:0 26px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);background:rgba(10,10,10,0.6);color:#FFFFFF;font-weight:600;font-size:16px;text-decoration:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 6h16v12H4z"></path><path d="M4 7l8 6 8-6"></path></svg>Contact Us</a>
+</div>
+</div>
+</section>
+
+<footer style="border-top:1px solid rgba(255,255,255,0.06)">
+<div style="max-width:1200px;margin:0 auto;padding:16px 24px;box-sizing:border-box;display:flex;flex-wrap:wrap;gap:8px 28px;align-items:center;justify-content:space-between">
+<img src="/media/protocol-logo.png" alt="Protocol" style="display:block;height:14px;width:auto">
+<nav aria-label="Footer" style="display:flex;gap:24px;flex-wrap:wrap">
+<a class="navlink" href="https://protocolapp.ai/privacy.html" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:14px;padding:12px 0">Privacy</a>
+<a class="navlink" href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:14px;padding:12px 0">Terms</a>
+<a class="navlink" href="https://protocolapp.ai/support.html" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:14px;padding:12px 0">Support</a>
+<a class="navlink" href="https://protocol-ai-backend-136ff028e7cc.herokuapp.com/sentinel/dashboard" style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:14px;padding:12px 0">Coach Portal</a>
+</nav>
+<span style="font-size:13px;color:rgba(255,255,255,0.5)">© 2026 Protocol</span>
+</div>
+</footer>
+
+</div>
+<script>
+(function () {
+  'use strict';
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  function heroInit() {
+    var c = document.querySelector('canvas[data-hero]');
+    if (!c || !c.getContext) return;
+    var ctx = c.getContext('2d');
+    if (!ctx) return;
+    var header = c.parentElement;
+    var ptr = null;
+    header.addEventListener('pointermove', function (e) {
+      var r = c.getBoundingClientRect();
+      ptr = { x: e.clientX - r.left, y: e.clientY - r.top };
+    });
+    header.addEventListener('pointerleave', function () { ptr = null; });
+
+    var S = 46;
+    var st = { W: 0, H: 0, cols: 0, rows: 0, nodes: [], formed: reduce, t0: performance.now(), last: performance.now(), pulses: [], nextPulse: 2.8, nextFlash: 1.6, vis: true };
+
+    function build() {
+      var r = c.getBoundingClientRect();
+      var d = Math.min(2, window.devicePixelRatio || 1);
+      st.W = r.width;
+      st.H = r.height;
+      if (!st.W || !st.H) return;
+      c.width = Math.round(st.W * d);
+      c.height = Math.round(st.H * d);
+      ctx.setTransform(d, 0, 0, d, 0, 0);
+      st.cols = Math.ceil(st.W / S) + 2;
+      st.rows = Math.ceil(st.H / S) + 2;
+      var ox = (st.W - (st.cols - 1) * S) / 2;
+      var oy = (st.H - (st.rows - 1) * S) / 2;
+      var cx = st.W / 2, cy = st.H * 0.52, maxD = Math.hypot(st.W / 2, st.H / 2);
+      st.nodes = [];
+      for (var j = 0; j < st.rows; j++) {
+        for (var i = 0; i < st.cols; i++) {
+          var hx = ox + i * S, hy = oy + j * S;
+          var e = Math.hypot((hx - cx) / (st.W * 0.3), (hy - cy) / (st.H * 0.36));
+          var m = 0.25 + 0.75 * Math.min(1, Math.max(0, (e - 0.55) / 0.8));
+          var n = {
+            hx: hx, hy: hy, x: hx, y: hy, vx: 0, vy: 0, m: m,
+            lv: Math.min(3, Math.floor(m * 3.999)),
+            sx: Math.random() * st.W, sy: Math.random() * st.H,
+            dl: 0.15 + Math.hypot(hx - cx, hy - cy) / maxD + Math.random() * 0.35,
+            p: st.formed ? 1 : 0, g: 0, f: 0
+          };
+          if (!st.formed) { n.x = n.sx; n.y = n.sy; }
+          st.nodes.push(n);
+        }
+      }
+    }
+
+    function step(te, dt) {
+      var nodes = st.nodes, n, i;
+      if (!st.formed) {
+        var done = true;
+        for (i = 0; i < nodes.length; i++) {
+          n = nodes[i];
+          var q = Math.min(1, Math.max(0, (te - n.dl) / 1.1));
+          var e = 1 - Math.pow(1 - q, 3);
+          var wob = (1 - e) * 12;
+          n.p = q;
+          n.x = n.sx + (n.hx - n.sx) * e + Math.sin(te * 1.7 + n.dl * 9) * wob;
+          n.y = n.sy + (n.hy - n.sy) * e + Math.cos(te * 1.3 + n.dl * 7) * wob;
+          if (q < 1) done = false;
+        }
+        if (done && nodes.length) {
+          st.formed = true;
+          for (i = 0; i < nodes.length; i++) {
+            n = nodes[i];
+            n.x = n.hx; n.y = n.hy; n.vx = 0; n.vy = 0; n.p = 1;
+          }
+        }
+        return;
+      }
+      var R = 150;
+      for (i = 0; i < nodes.length; i++) {
+        n = nodes[i];
+        var ax = 70 * (n.hx - n.x) - 10 * n.vx;
+        var ay = 70 * (n.hy - n.y) - 10 * n.vy;
+        if (ptr) {
+          var dx = n.x - ptr.x, dy = n.y - ptr.y, dd = Math.hypot(dx, dy);
+          if (dd < R && dd > 0.5) {
+            var f = Math.pow(1 - dd / R, 2) * 2600;
+            ax += (dx / dd) * f;
+            ay += (dy / dd) * f;
+          }
+        }
+        n.vx += ax * dt; n.vy += ay * dt;
+        n.x += n.vx * dt; n.y += n.vy * dt;
+        n.f = Math.max(0, n.f - dt * 0.8);
+      }
+      st.nextPulse -= dt;
+      if (st.nextPulse <= 0 && nodes.length) {
+        st.nextPulse = 3.4;
+        var o = nodes[Math.floor(Math.random() * nodes.length)];
+        st.pulses.push({ x: o.hx, y: o.hy, t: te });
+      }
+      st.nextFlash -= dt;
+      if (st.nextFlash <= 0 && nodes.length) {
+        st.nextFlash = 0.45;
+        var o2 = nodes[Math.floor(Math.random() * nodes.length)];
+        if (o2.m > 0.55) o2.f = 1;
+      }
+      var maxR = Math.hypot(st.W, st.H) + 60;
+      st.pulses = st.pulses.filter(function (q) { return (te - q.t) * 320 < maxR; });
+      for (i = 0; i < nodes.length; i++) {
+        n = nodes[i];
+        var g = 0;
+        for (var k = 0; k < st.pulses.length; k++) {
+          var pq = st.pulses[k];
+          var rr = (te - pq.t) * 320;
+          var dist = Math.hypot(n.hx - pq.x, n.hy - pq.y);
+          var kk = 1 - Math.abs(dist - rr) / 36;
+          if (kk > g) g = kk;
+        }
+        n.g = g;
+      }
+    }
+
+    function draw() {
+      var W = st.W, H = st.H, cols = st.cols, rows = st.rows, nodes = st.nodes;
+      ctx.clearRect(0, 0, W, H);
+      if (!nodes.length) return;
+      var buckets = [[], [], [], []], hot = [], i, j, k, a, b;
+      for (j = 0; j < rows; j++) {
+        for (i = 0; i < cols; i++) {
+          a = nodes[j * cols + i];
+          for (var s = 0; s < 2; s++) {
+            b = s === 0 ? (i + 1 < cols ? nodes[j * cols + i + 1] : null) : (j + 1 < rows ? nodes[(j + 1) * cols + i] : null);
+            if (!b || a.p < 1 || b.p < 1) continue;
+            buckets[Math.min(a.lv, b.lv)].push(a, b);
+            if ((a.g > 0 && b.g > 0) || Math.hypot(b.x - a.x, b.y - a.y) > S * 1.06) hot.push(a, b);
+          }
+        }
+      }
+      ctx.lineWidth = 1;
+      for (var bi = 0; bi < 4; bi++) {
+        var L = buckets[bi];
+        if (!L.length) continue;
+        ctx.strokeStyle = 'rgba(255,255,255,' + (0.03 + bi * 0.025).toFixed(3) + ')';
+        ctx.beginPath();
+        for (k = 0; k < L.length; k += 2) {
+          ctx.moveTo(L[k].x, L[k].y);
+          ctx.lineTo(L[k + 1].x, L[k + 1].y);
+        }
+        ctx.stroke();
+      }
+      for (k = 0; k < hot.length; k += 2) {
+        a = hot[k]; b = hot[k + 1];
+        var len = Math.hypot(b.x - a.x, b.y - a.y);
+        var ten = Math.min(1, Math.max(0, (len - S) / (S * 0.6)));
+        var g = Math.min(a.g, b.g);
+        var al = Math.max(g * 0.55, ten * 0.6) * Math.max(a.m, 0.5);
+        if (al < 0.02) continue;
+        ctx.strokeStyle = 'rgba(62,207,212,' + al.toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+      for (i = 0; i < nodes.length; i++) {
+        var n = nodes[i];
+        ctx.fillStyle = 'rgba(255,255,255,' + ((0.18 + 0.4 * n.p) * n.m).toFixed(3) + ')';
+        ctx.fillRect(n.x - 1, n.y - 1, 2, 2);
+        if (n.g > 0.05) {
+          var sz = 2 + n.g * 2;
+          ctx.fillStyle = 'rgba(62,207,212,' + (n.g * 0.9 * Math.max(n.m, 0.45)).toFixed(3) + ')';
+          ctx.fillRect(n.x - sz / 2, n.y - sz / 2, sz, sz);
+        }
+        if (n.f > 0.02) {
+          ctx.fillStyle = 'rgba(212,160,62,' + n.f.toFixed(3) + ')';
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 2.6, 0, 6.2832);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(212,160,62,' + (n.f * 0.45).toFixed(3) + ')';
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, 3 + (1 - n.f) * 16, 0, 6.2832);
+          ctx.stroke();
+        }
+      }
+    }
+
+    build();
+    draw();
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(function () { build(); draw(); }).observe(c);
+    } else {
+      window.addEventListener('resize', function () { build(); draw(); });
+    }
+    if (reduce) return;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        st.vis = entries.some(function (x) { return x.isIntersecting; });
+      }).observe(c);
+    }
+    function tick(now) {
+      requestAnimationFrame(tick);
+      var dt = Math.min(1 / 30, Math.max(0, (now - st.last) / 1000));
+      st.last = now;
+      if (!st.vis || document.hidden) return;
+      step((now - st.t0) / 1000, dt);
+      draw();
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function each(sel, fn) { Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
+  function onOff(prefix, idx, n) {
+    for (var i = 0; i < n; i++) {
+      (function (i) {
+        each('[data-k="' + prefix + i + '"]', function (el) { el.classList.toggle('on', i === idx); });
+      })(i);
+    }
+  }
+  function show(prefix, idx, n) {
+    for (var i = 0; i < n; i++) {
+      (function (i) {
+        each('[data-show="' + prefix + i + '"]', function (el) { el.hidden = i !== idx; });
+      })(i);
+    }
+  }
+  function lit(key, on) { each('[data-k="' + key + '"]', function (el) { el.classList.toggle('lit', on); }); }
+
+  var clips = [
+    { sel: 'video[data-meal]', bounds: [3.0, 8.1, 10.2, 16.9, 17.7], still: 2, stillTime: 9.2,
+      apply: function (s) { var mi = s === 0 ? 0 : (s <= 2 ? 1 : (s <= 4 ? 2 : 3)); onOff('m', mi, 4); show('r', s, 6); } },
+    { sel: 'video[data-body]', bounds: [1.5, 4.8], still: 2, stillTime: 6.0,
+      apply: function (s) { onOff('b', s, 3); } },
+    { sel: 'video[data-coach]', bounds: [3.27, 5.71, 6.78, 8.71, 12.11, 13.44], still: 6, stillTime: 20.5,
+      apply: function (s) { lit('hw', s === 2 || s === 5 || s === 6); lit('hc', s === 3 || s === 6); lit('hm', s === 4 || s === 6); show('q', s, 7); } },
+    { sel: 'video[data-cal]', bounds: [2.7, 8.4, 10.5], still: 3, stillTime: 12.5,
+      apply: function (s) { onOff('k', s, 4); } }
+  ];
+
+  function clipInit(cfg) {
+    var v = document.querySelector(cfg.sel);
+    if (!v) return;
+    v.muted = true;
+    v.defaultMuted = true;
+    v.loop = true;
+    v.playsInline = true;
+    v.setAttribute('playsinline', '');
+    v.setAttribute('muted', '');
+    var cur = -1;
+    function set(s) { if (s !== cur) { cur = s; cfg.apply(s); } }
+    function stepAt(t) { var s = 0; while (s < cfg.bounds.length && t >= cfg.bounds[s]) s++; return s; }
+    if (reduce) {
+      set(cfg.still);
+      var seek = function () { try { v.currentTime = cfg.stillTime; } catch (e) {} };
+      if (v.readyState >= 1) seek(); else v.addEventListener('loadedmetadata', seek, { once: true });
+      v.preload = 'auto';
+      return;
+    }
+    set(0);
+    v.addEventListener('timeupdate', function () { set(stepAt(v.currentTime || 0)); });
+    var play = function () { var p = v.play(); if (p && p.catch) p.catch(function () {}); };
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) play(); else v.pause(); });
+      }, { threshold: 0.25 }).observe(v);
+    } else {
+      play();
+    }
+  }
+
+  heroInit();
+  clips.forEach(clipInit);
+})();
+</script>
 </body>
 </html>
